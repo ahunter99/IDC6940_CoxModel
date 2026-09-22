@@ -33,42 +33,6 @@ Nice report! I am adding this to show updates from RStudio.
 :::
 
 ## Introduction
-
-The introduction should:
-
--   Develop a storyline that captures attention and maintains interest.
-
--   Your audience is your peers
-
--   Clearly state the problem or question you're addressing.
-
-<!-- -->
-
--   Introduce why it is relevant needs.
-
--   Provide an overview of your approach.
-
-Example of writing including citing references:
-
-*This is an introduction to ..... regression, which is a non-parametric
-estimator that estimates the conditional expectation of two variables
-which is random. The goal of a kernel regression is to discover the
-non-linear relationship between two random variables. To discover the
-non-linear relationship, kernel estimator or kernel smoothing is the
-main method to estimate the curve for non-parametric statistics. In
-kernel estimator, weight function is known as kernel function
-[@efr2008]. Cite this paper [@bro2014principal]. The GEE [@wang2014].
-The PCA [@daffertshofer2004pca]*. Topology can be used in machine 
-learning [@adams2021topology]
-
-For Symbolic Regression [@wang2019symbolic] *This is my work and I want
-to add more work...*
-
-Cite new paper [@su2012linear]
-
-Classification of Knee OA was studied here [@guida2021knee]. This is another example of LCA [@weller2020latent]
-
-Introduction
 The Cox Proportional Hazards model is a regression method used to analyze the relationships between variables and the time until a specific event occurs. Survival analysis accounts for both the occurrence of an event and the length of time before the event, while accounting for censored observations. The Cox model expresses an individual’s hazard at time (t) as  
 λ(t׀X) = λ0(t)exp (β' • X), where λ0 is the baseline hazard, β' is a vector of regression coefficients, and X is a vector of time-fixed covariates (Bellera 2010). Exponentiating a coefficient produces a hazard ratio, which describes the relative risk of experiencing the event while holding other variables constant. A hazard ratio greater than one indicates an increased risk. For example, Cox models have been used to study the duration of the birth process (Wuryandari et al. 2018), the time until farmers are willing to pay agricultural insurance premiums (Hidayat et al. 2022), website drop-offs (Soobramoney et al. 2023), credit default (Dirick et al. 2017), and survival following cancer treatments (Abadi et al. 2014). These applications demonstrate how the model can be used when the outcome of interest involves the time until a specified event. The general process for conducting a Cox proportional hazards analysis is 1. Define the event of interest, survival time, and censoring indicator, 2. Select the explanatory variables that may affect the event hazard, 3. Fit the Cox proportional hazards model and estimate its coefficients, 4. Convert the coefficients into hazard ratios and calculate their confidence intervals, 5. Test whether the proportional hazards assumption is satisfied, 6. Evaluate model fit and interpret the estimated effects within the context of the research question (Lee 2023).
 
