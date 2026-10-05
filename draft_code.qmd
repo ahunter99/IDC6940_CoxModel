@@ -1,0 +1,195 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+```{r}
+options(repos = c(CRAN = "https://cran.r-project.org"))
+install.packages(c("tidyverse", "survival", "survminer", "skimr", "naniar"))
+```
+
+```{r}
+library(tidyverse)
+library(survival)
+library(survminer)
+library(skimr)   
+```
+
+```{r}
+data_raw <- read_csv("ipr_dataset.csv", na = c("", "NA"))
+dim(data_raw) 
+```
+
+```{r}
+skim(data_raw)
+```
+
+```{r}
+data_raw %>%
+  count(recid_missing = is.na(days_to_recid))
+```
+
+```{r}
+empty_cols <- names(data_raw)[colSums(is.na(data_raw)) == nrow(data_raw)]
+empty_cols
+
+data_raw <- data_raw %>% select(-all_of(empty_cols))
+
+```
+
+```{r}
+df <- data_raw %>%
+  mutate(
+    event = if_else(!is.na(days_to_recid), 1, 0),
+    release_date = as.Date(exit_sup_end_date),
+    time_days = if_else(event == 1, days_to_recid, 1095)
+  )
+
+
+max(df$days_to_recid, na.rm = TRUE)   
+df %>% filter(event == 0) %>% pull(time_days) %>% summary()  
+
+```
+
+```{r}
+sum(df$time_days == 0, na.rm = TRUE)   
+
+df <- df %>% mutate(time_days = if_else(time_days == 0, 0.5, time_days))
+```
+
+```{r}
+df <- df %>%
+  unite("exit_combined", exit_type, exit_subtype, sep = " - ", remove = FALSE) %>%
+  mutate(
+    sex           = factor(sex),
+    Race          = factor(Race),
+    exit_type     = factor(exit_type),
+    exit_sup      = factor(exit_sup),
+    risk_ranking  = factor(
+      if_else(is.na(risk_ranking), "Not assessed", risk_ranking),
+      levels = c("Low", "Moderate", "High", "Not assessed")
+    ),
+    age_c         = age - mean(age, na.rm = TRUE)
+  )
+df <- df %>% filter(!is.na(sex))
+
+```
+
+```{r}
+df %>% summarise(recid_rate = mean(event), n = n())
+
+df %>% group_by(sex)          %>% summarise(recid_rate = mean(event), n = n())
+df %>% group_by(risk_ranking) %>% summarise(recid_rate = mean(event), n = n())
+df %>% group_by(exit_type)    %>% summarise(recid_rate = mean(event), n = n())
+df %>% group_by(exit_sup)     %>% summarise(recid_rate = mean(event), n = n())
+df %>% group_by(Race)         %>% summarise(recid_rate = mean(event), n = n())
+```
+
+```{r}
+df %>%
+  filter(event == 1) %>%
+  ggplot(aes(x = survival_time_months)) +
+  geom_histogram(binwidth = 1, fill = "#d1495b", color = "white") +
+  labs(title = "When Does Reincarceration Occur?",
+       x = "Months to reincarceration", y = "Count") +
+  theme_minimal()
+
+```
+
+```{r}
+set.seed(20)  
+
+pt <- df %>%
+  slice_sample(n = 20) %>%
+  arrange(time_days) %>%
+  mutate(id = row_number())
+
+plot(NA, xlim = c(0, 1200), ylim = c(0.5, 20.5),
+     xlab = "Days since release", ylab = "Individual", yaxt = "n",
+     main = "Time to Reincarceration: Events vs. Censoring")
+axis(2, at = 1:20, labels = paste0("P", 1:20), cex.axis = 0.7)
+abline(v = 1095, lty = 2, col = "grey60")            
+text(1095, 20.4, "3-yr cutoff", pos = 2, col = "grey40", cex = 0.8)
+
+for (i in 1:20) {
+  segments(0, pt$id[i], pt$time_days[i], pt$id[i], col = "#3a86d4", lwd = 3)
+  if (pt$event[i] == 1) {
+    points(pt$time_days[i], pt$id[i], pch = 19, col = "#d1495b", cex = 1.4)   
+  } else {
+    points(pt$time_days[i], pt$id[i], pch = ">", col = "#3a86d4", cex = 1.4) 
+  }
+}
+legend("bottomright", bty = "n",
+       legend = c("recidivated (event)", "censored (no return by cutoff)"),
+       pch = c(19, 62), col = c("#d1495b", "#3a86d4"))
+```
+
+```{r}
+km_risk <- survfit(Surv(time_days, event) ~ risk_ranking, data = df)
+
+plot(km_risk, col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
+     xlab = "Days since release", ylab = "Probability of remaining in community",
+     main = "Time to Reincarceration by Risk Classification")
+legend("bottomleft", bty = "n", lwd = 2,
+       legend = levels(df$risk_ranking),
+       col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
+
+```
+
+```{r}
+km_risk <- survfit(Surv(time_days, event) ~ exit_type, data = df)
+
+plot(km_risk, col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
+     xlab = "Days since release", ylab = "Probability of remaining in community",
+     main = "Time to Reincarceration by Offense Type")
+legend("bottomleft", bty = "n", lwd = 2,
+       legend = levels(df$exit_type),
+       col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
+
+survdiff(Surv(time_days, event) ~ exit_type, data = df)
+```
+
+```{r}
+km_risk <- survfit(Surv(time_days, event) ~ sex, data = df)
+
+plot(km_risk, col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
+     xlab = "Days since release", ylab = "Probability of remaining in community",
+     main = "Time to Reincarceration by Sex")
+legend("bottomleft", bty = "n", lwd = 2,
+       legend = levels(df$sex),
+       col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
+
+survdiff(Surv(time_days, event) ~ sex, data = df)
+```
+
+```{r}
+km_risk <- survfit(Surv(time_days, event) ~ exit_sup, data = df)
+
+plot(km_risk, col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
+     xlab = "Days since release", ylab = "Probability of remaining in community",
+     main = "Time to Reincarceration by Release Type")
+legend("bottomleft", bty = "n", lwd = 2,
+       legend = levels(df$exit_sup),
+       col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
+
+survdiff(Surv(time_days, event) ~ exit_sup, data = df)
+```
+
+```{r}
+survdiff(Surv(time_days, event) ~ risk_ranking, data = df)
+survdiff(Surv(time_days, event) ~ exit_type,    data = df)
+survdiff(Surv(time_days, event) ~ sex,          data = df)
+survdiff(Surv(time_days, event) ~ exit_sup,     data = df)
+```
+
+```{r}
+plot(km_risk, fun = "cloglog",
+     col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
+     xlab = "Days since release (log scale)",
+     ylab = "log(-log(Survival))",
+     main = "Log-Minus-Log Plot: Risk Classification")
+legend("bottomright", bty = "n", lwd = 2,
+       legend = levels(df$risk_ranking),
+       col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
+```
