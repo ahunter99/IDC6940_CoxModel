@@ -23,12 +23,7 @@ to edit)
 
 
 ## Introduction
-The Cox Proportional Hazards model is a regression method used to analyze the relationships between variables and the time until a specific event occurs. Survival analysis accounts for both the occurrence of an event and the length of time before the event, while accounting for censored observations. The Cox model expresses an individual’s hazard at time (t) as  
-λ(t׀X) = λ0(t)exp (β' • X), where λ0 is the baseline hazard, β' is a vector of regression coefficients, and X is a vector of time-fixed covariates [@bellera2010]. Exponentiating a coefficient produces a hazard ratio, which describes the relative risk of experiencing the event while holding other variables constant. A hazard ratio greater than one indicates an increased risk. For example, Cox models have been used to study the duration of the birth process [@wuryandari2018], the time until farmers are willing to pay agricultural insurance premiums [@hidayat2022], website drop-offs [@soobramoney2023], credit default [@dirick2017], and survival following cancer treatments [@abadi2014]. These applications demonstrate how the model can be used when the outcome of interest involves the time until a specified event. The general process for conducting a Cox proportional hazards analysis is 1. Define the event of interest, survival time, and censoring indicator, 2. Select the explanatory variables that may affect the event hazard, 3. Fit the Cox proportional hazards model and estimate its coefficients, 4. Convert the coefficients into hazard ratios and calculate their confidence intervals, 5. Test whether the proportional hazards assumption is satisfied, 6. Evaluate model fit and interpret the estimated effects within the context of the research question [@lee2023].
 
-The central assumption of the Cox model is that the hazard ratio associated with a predictor remains constant throughout the observation period. In other words, the model assumes that the hazards for two individuals or groups are proportional over time. The assumption can be evaluated using Kaplan-Meier curves, log-minus-log plots, Schoenfeld residuals, or interactions between predictors and time. However, reviews of pediatric leukemia and total joint arthroplasty research found that the proportional hazards assumption was frequently unreported or poorly evaluated [@kuitunen2021]; [@kuitunen2023]. Time-varying effects should be investigated as a regular part of Cox regression analysis rather than assuming that proportionality automatically holds [@bellera2010].
-
-One limitation of the Cox proportional hazards model is its assumption that the hazard ratio for each predictor remains constant throughout the study period. If a predictor has a stronger effect at one point in time than another, this assumption is violated. The model may then produce a single hazard ratio that does not accurately represent the changing relationship. Researchers should therefore test the proportional hazards assumption before interpreting the model’s results. When the assumption is violated, modifications such as stratifying the model or including time-dependent effects may be necessary. The performance of these approaches can vary according to the sample size, censoring rate, and distribution of survival times [@iketle2024]. Although the Cox proportional hazards model is flexible, reliable results depend on properly accounting for censored observations and verifying that the proportional hazards assumption is appropriate.
 
 
 ### Literature Review
@@ -49,26 +44,22 @@ Overall, the Cox PH is well suited to the structure of the Iowa data. This study
 
 -   Justify your choices based on the problem and data.
 
-*The common non-parametric regression model is*
-$Y_i = m(X_i) + \varepsilon_i$*, where* $Y_i$ *can be defined as the sum
-of the regression function value* $m(x)$ *for* $X_i$*. Here* $m(x)$ *is
-unknown and* $\varepsilon_i$ *some errors. With the help of this
-definition, we can create the estimation for local averaging i.e.*
-$m(x)$ *can be estimated with the product of* $Y_i$ *average and* $X_i$
-*is near to* $x$*. In other words, this means that we are discovering
-the line through the data points with the help of surrounding data
-points. The estimation formula is printed below [@R-base]:*
+The Cox Proportional Hazards model is a regression method used to analyze the relationships between variables and the time until a specific event occurs. Survival analysis accounts for both the occurrence of an event and the length of time before the event, while accounting for censored observations. 
+
+The Cox model expresses an individual's hazard at time $t$ as
 
 $$
-M_n(x) = \sum_{i=1}^{n} W_n (X_i) Y_i  \tag{1}
-$$$W_n(x)$ *is the sum of weights that belongs to all real numbers.
-Weights are positive numbers and small if* $X_i$ *is far from* $x$*.*
-
-*Another equation:*
-
+\lambda(t \mid X) = \lambda_0(t) \exp(\beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p)
 $$
-y_i = \beta_0 + \beta_1 X_1 +\varepsilon_i
 $$
+\text{HR} = \exp(\beta_j)
+$$
+
+where $\lambda_0(t)$ is the baseline hazard, $\boldsymbol{\beta}$ is a vector of regression coefficients, and $X$ is a vector of time-fixed covariates [@bellera2010]. Exponentiating a coefficient produces a hazard ratio, which describes the relative risk of experiencing the event while holding other variables constant. A hazard ratio greater than one indicates an increased risk. For example, Cox models have been used to study the duration of the birth process [@wuryandari2018], the time until farmers are willing to pay agricultural insurance premiums [@hidayat2022], website drop-offs [@soobramoney2023], credit default [@dirick2017], and survival following cancer treatments [@abadi2014]. These applications demonstrate how the model can be used when the outcome of interest involves the time until a specified event. The general process for conducting a Cox proportional hazards analysis is 1. Define the event of interest, survival time, and censoring indicator, 2. Select the explanatory variables that may affect the event hazard, 3. Fit the Cox proportional hazards model and estimate its coefficients, 4. Convert the coefficients into hazard ratios and calculate their confidence intervals, 5. Test whether the proportional hazards assumption is satisfied, 6. Evaluate model fit and interpret the estimated effects within the context of the research question [@lee2023].
+
+The central assumption of the Cox model is that the hazard ratio associated with a predictor remains constant throughout the observation period. In other words, the model assumes that the hazards for two individuals or groups are proportional over time. The assumption can be evaluated using Kaplan-Meier curves, log-minus-log plots, Schoenfeld residuals, or interactions between predictors and time. However, reviews of pediatric leukemia and total joint arthroplasty research found that the proportional hazards assumption was frequently unreported or poorly evaluated [@kuitunen2021]; [@kuitunen2023]. Time-varying effects should be investigated as a regular part of Cox regression analysis rather than assuming that proportionality automatically holds [@bellera2010].
+
+One limitation of the Cox proportional hazards model is its assumption that the hazard ratio for each predictor remains constant throughout the study period. If a predictor has a stronger effect at one point in time than another, this assumption is violated. The model may then produce a single hazard ratio that does not accurately represent the changing relationship. Researchers should therefore test the proportional hazards assumption before interpreting the model’s results. When the assumption is violated, modifications such as stratifying the model or including time-dependent effects may be necessary. The performance of these approaches can vary according to the sample size, censoring rate, and distribution of survival times [@iketle2024]. Although the Cox proportional hazards model is flexible, reliable results depend on properly accounting for censored observations and verifying that the proportional hazards assumption is appropriate.
 
 ## Analysis and Results
 
@@ -80,7 +71,7 @@ $$
 
 -   Highlight unexpected patterns or anomalies.
 
-A study was conducted to determine how...
+
 
 ```{r, warning=FALSE, echo=T, message=FALSE}
 # loading packages 
@@ -93,8 +84,6 @@ library(survival)
 library(survminer)
 library(skimr)  
 ```
-
-
 
 ```{r, warning=FALSE, echo=TRUE}
 # Load Data
