@@ -72,14 +72,13 @@ One limitation of the Cox proportional hazards model is its assumption that the 
 ## Analysis and Results
 
 ### Data Exploration and Visualization
+The Iowa Prison Recidivism Status dataset contains case-level records of individuals released from Iowa prisons through parole, work release, or discharge, beginning with the FY2016 cohort. It covers releases from July 2015 through June 2022 and tracks whether each individual was reincarcerated. Available variables include age, sex, race, the original offense, the convicting offense on recidivism if one occurred, and a risk classification.
 
--   Describe your data sources and collection process.
+This analysis looks at reincarceration outcomes for 31,703 individuals who were followed for up to three years after release. The overall reincarceration rate was 36.9%, but this rate varied across demographic and offense-based subgroups. Violent offenders had the lowest rate at 29.2%, while individuals convicted of "other" offenses had the highest at 50.3%. This goes against a common assumption that more severe offenses lead to worse reentry outcomes. The timing of reincarceration also showed a clear pattern. Most returns happened within the first six months after release, and the rate of return leveled off after that point.
 
--   Present initial findings and insights through visualizations.
+Differences appeared across several other groups as well. Males were reincarcerated at a rate about 8 percentage points higher than females (38.0% vs. 30.0%). American Indian or Alaska Native individuals had the highest rate of any racial group at 44.7%. Risk classification separated outcomes as intended, with high risk individuals reincarcerated at a rate of 42.0% compared to 31.4% for low risk individuals. However, individuals who were never formally assessed had a lower rate than the low risk group. This might indicate some bias and should be investigated further.
 
--   Highlight unexpected patterns or anomalies.
-
-
+The eight release supervision types in the data also produced different outcomes. Individuals discharged at the expiration of their sentence had survival probabilities staying above 70% across the full three year period. Those paroled with immediate discharge and those released to special sentences had survival probabilities falling below 60% within the first year. Individuals granted parole, who made up the largest group at 20,551, fell in between. These differences suggest that release type may be more than a marker of underlying offender characteristics, and that supervision conditions themselves could shape reentry outcomes.
 
 ```{r, warning=FALSE, echo=T, message=FALSE}
 # loading packages 
@@ -116,7 +115,7 @@ df <- df %>%
     sex           = factor(sex),
     Race          = factor(Race),
     exit_type     = factor(exit_type),
-    exit_sup      = factor(exit_sup),
+    exit_sup_reason      = factor(exit_sup_reason),
     risk_ranking  = factor(
       if_else(is.na(risk_ranking), "Not assessed", risk_ranking),
       levels = c("Low", "Moderate", "High", "Not assessed")
@@ -202,16 +201,16 @@ survdiff(Surv(time_days, event) ~ sex, data = df)
 
 
 ```{r}
-km_risk <- survfit(Surv(time_days, event) ~ exit_sup, data = df)
+km_risk <- survfit(Surv(time_days, event) ~ exit_sup_reason, data = df)
 
 plot(km_risk, col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
      xlab = "Days since release", ylab = "Probability of remaining in community",
      main = "Time to Reincarceration by Release Type")
 legend("bottomleft", bty = "n", lwd = 2,
-       legend = levels(df$exit_sup),
+       legend = levels(df$exit_sup_reason),
        col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
 
-survdiff(Surv(time_days, event) ~ exit_sup, data = df)
+survdiff(Surv(time_days, event) ~ exit_sup_reason, data = df)
 ```
 
 
