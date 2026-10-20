@@ -140,83 +140,26 @@ The following object is masked from 'package:survival':
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)   </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data_raw <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"ipr_dataset.csv"</span>) </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"ipr_dataset.csv"</span>, <span class="at">na =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"NA"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 31703 Columns: 37
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (18): Race, sex, region_exit, exit_sup, report_fiscal_year_name, exit_s...
+dbl   (8): age, cohort_fiscal_year, report_fiscal_year, months_supervised, c...
+lgl   (8): record_id, offender_cd, birth_date, is_recid, total_violence_scor...
+date  (3): exit_sup_start_date, exit_sup_end_date, submitted_date
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(data_raw) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  record_id offender_cd birth_date age  Race    sex
-1        NA          NA         NA  25 White   Male
-2        NA          NA         NA  42 White   Male
-3        NA          NA         NA  38 White Female
-4        NA          NA         NA  27 Black   Male
-5        NA          NA         NA  25 White   Male
-6        NA          NA         NA  37 White   Male
-                              region_exit     exit_sup cohort_fiscal_year
-1    Mount Pleasant Correctional Facility Work Release               2016
-2    Mount Pleasant Correctional Facility       Prison               2016
-3 Iowa Correctional Institution for Women Work Release               2016
-4          Clarinda Correctional Facility       Prison               2016
-5                 Iowa State Penitentiary Work Release               2016
-6        Fort Dodge Correctional Facility       Prison               2016
-  report_fiscal_year report_fiscal_year_name exit_sup_start_date
-1               2019                 FY 2019          2015-04-21
-2               2019                 FY 2019          2015-02-23
-3               2019                 FY 2019          2015-02-09
-4               2019                 FY 2019          2013-09-26
-5               2019                 FY 2019          2015-02-19
-6               2019                 FY 2019          2014-09-29
-  exit_sup_end_date months_supervised                     exit_sup_reason
-1        2015-07-01                 3                      Parole Granted
-2        2015-07-01                 5                      Parole Granted
-3        2015-07-01                 5                      Parole Granted
-4        2015-07-01                22 Discharged - Expiration of Sentence
-5        2015-07-01                 5                      Parole Granted
-6        2015-07-02                10                      Parole Granted
-  charge_id             exit_class    exit_type        exit_subtype is_recid
-1  20176150               D Felony     Property               Arson     True
-2  20294778 Aggravated Misdemeanor Public Order                 OWI     True
-3  20083680               C Felony      Violent Murder/Manslaughter     True
-4    896648               C Felony     Property               Theft     True
-5  20136202               D Felony         Drug         Trafficking     True
-6  20181271               C Felony         Drug          Other Drug     True
-    new_tech days_to_recid survival_time_months recid_convicting_crime_cd
-1       Tech           225             7.500000                   712.8-A
-2       Tech           202             6.733333                 321J.2(B)
-3       Tech           124             4.133333                 707.6A(2)
-4 New Charge           891            29.700000                 724.26(1)
-5 New Charge           995            33.166667                  714.2(3)
-6       Tech           768            25.600000                 124B.9(1)
-  recid_convicting_crime_cd_class recid_convicting_crime_type
-1                        D Felony                    Property
-2          Aggravated Misdemeanor                Public Order
-3                        C Felony                     Violent
-4                        D Felony                Public Order
-5          Aggravated Misdemeanor                    Property
-6                        C Felony                        Drug
-  recid_convicting_crime_subtype submitted_date total_violence_score
-1                          Arson     2015-04-22                   NA
-2                            OWI     2015-05-01                   NA
-3            Murder/Manslaughter     2014-09-19                   NA
-4                        Weapons     2013-09-30                   NA
-5                          Theft     2015-04-01                   NA
-6                     Other Drug     2015-09-23                   NA
-  violence_risk total_victimization_score victimization_risk ranking_number
-1            NA                        NA                 NA              1
-2            NA                        NA                 NA              3
-3            NA                        NA                 NA              2
-4            NA                        NA                 NA              2
-5            NA                        NA                 NA              3
-6            NA                        NA                 NA              2
-  risk_ranking regcd_exit work_unit_region_nm work_unit_nm
-1         High                                            
-2          Low                                            
-3     Moderate                                            
-4     Moderate                                            
-5          Low                                            
-6     Moderate                                            </code></pre>
+<pre><code>[1] 31703    37</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(data_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(data_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Data summary</caption>
@@ -243,21 +186,25 @@ The following object is masked from 'package:survival':
 </tr>
 <tr class="even">
 <td style="text-align: left;">character</td>
-<td style="text-align: left;">22</td>
+<td style="text-align: left;">18</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">logical</td>
-<td style="text-align: left;">7</td>
+<td style="text-align: left;">Date</td>
+<td style="text-align: left;">3</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">logical</td>
 <td style="text-align: left;">8</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">8</td>
+</tr>
+<tr class="even">
 <td style="text-align: left;">________________________</td>
 <td style="text-align: left;"></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">Group variables</td>
 <td style="text-align: left;">None</td>
 </tr>
@@ -291,7 +238,7 @@ The following object is masked from 'package:survival':
 <tr class="odd">
 <td style="text-align: left;">Race</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">32</td>
 <td style="text-align: right;">0</td>
@@ -300,18 +247,18 @@ The following object is masked from 'package:survival':
 </tr>
 <tr class="even">
 <td style="text-align: left;">sex</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">6</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">region_exit</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
 <td style="text-align: right;">20</td>
 <td style="text-align: right;">39</td>
 <td style="text-align: right;">0</td>
@@ -321,7 +268,7 @@ The following object is masked from 'package:survival':
 <tr class="even">
 <td style="text-align: left;">exit_sup</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">0</td>
@@ -331,37 +278,17 @@ The following object is masked from 'package:survival':
 <tr class="odd">
 <td style="text-align: left;">report_fiscal_year_name</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">7</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">exit_sup_start_date</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">3030</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">exit_sup_end_date</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">2522</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">exit_sup_reason</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
 <td style="text-align: right;">14</td>
 <td style="text-align: right;">35</td>
 <td style="text-align: right;">0</td>
@@ -371,7 +298,7 @@ The following object is masked from 'package:survival':
 <tr class="odd">
 <td style="text-align: left;">exit_class</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">40</td>
 <td style="text-align: right;">0</td>
@@ -381,7 +308,7 @@ The following object is masked from 'package:survival':
 <tr class="even">
 <td style="text-align: left;">exit_type</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">0</td>
@@ -391,7 +318,7 @@ The following object is masked from 'package:survival':
 <tr class="odd">
 <td style="text-align: left;">exit_subtype</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">20</td>
 <td style="text-align: right;">0</td>
@@ -399,119 +326,158 @@ The following object is masked from 'package:survival':
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">is_recid</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: left;">new_tech</td>
+<td style="text-align: right;">20004</td>
+<td style="text-align: right;">0.37</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">5</td>
+<td style="text-align: right;">10</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">new_tech</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">20004</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
 <td style="text-align: left;">recid_convicting_crime_cd</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">20004</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: right;">5</td>
 <td style="text-align: right;">19</td>
-<td style="text-align: right;">20004</td>
-<td style="text-align: right;">300</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">299</td>
 <td style="text-align: right;">0</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">recid_convicting_crime_cd_class</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">20004</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: right;">8</td>
 <td style="text-align: right;">40</td>
-<td style="text-align: right;">20004</td>
-<td style="text-align: right;">12</td>
 <td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">recid_convicting_crime_type</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">20004</td>
-<td style="text-align: right;">6</td>
+<td style="text-align: right;">11</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">recid_convicting_crime_subtype</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">20</td>
+<td style="text-align: left;">recid_convicting_crime_type</td>
 <td style="text-align: right;">20004</td>
-<td style="text-align: right;">25</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">5</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">submitted_date</td>
+<td style="text-align: left;">recid_convicting_crime_subtype</td>
+<td style="text-align: right;">20004</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">20</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">1569</td>
-<td style="text-align: right;">2238</td>
+<td style="text-align: right;">24</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">risk_ranking</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">8</td>
 <td style="text-align: right;">1569</td>
-<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.95</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">regcd_exit</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">20</td>
 <td style="text-align: right;">14377</td>
-<td style="text-align: right;">52</td>
+<td style="text-align: right;">0.55</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">51</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">work_unit_region_nm</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">39</td>
 <td style="text-align: right;">14377</td>
-<td style="text-align: right;">21</td>
+<td style="text-align: right;">0.55</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">20</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">work_unit_nm</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">50</td>
 <td style="text-align: right;">14406</td>
-<td style="text-align: right;">54</td>
+<td style="text-align: right;">0.55</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">50</td>
 <td style="text-align: right;">0</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: Date</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 11%">
+<col style="width: 16%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: left;">min</th>
+<th style="text-align: left;">max</th>
+<th style="text-align: left;">median</th>
+<th style="text-align: right;">n_unique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">exit_sup_start_date</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">1972-10-18</td>
+<td style="text-align: left;">2022-05-12</td>
+<td style="text-align: left;">2017-10-24</td>
+<td style="text-align: right;">3030</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">exit_sup_end_date</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">2015-07-01</td>
+<td style="text-align: left;">2022-06-30</td>
+<td style="text-align: left;">2018-10-16</td>
+<td style="text-align: right;">2522</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">submitted_date</td>
+<td style="text-align: right;">1569</td>
+<td style="text-align: right;">0.95</td>
+<td style="text-align: left;">2013-01-29</td>
+<td style="text-align: left;">2022-05-18</td>
+<td style="text-align: left;">2017-10-19</td>
+<td style="text-align: right;">2237</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Variable type: logical</strong></p>
 <table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 12%">
+<col style="width: 17%">
+<col style="width: 6%">
+<col style="width: 29%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">skim_variable</th>
@@ -544,27 +510,34 @@ The following object is masked from 'package:survival':
 <td style="text-align: left;">:</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">is_recid</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: left;">FAL: 20004, TRU: 11699</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">total_violence_score</td>
 <td style="text-align: right;">31703</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">NaN</td>
 <td style="text-align: left;">:</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">violence_risk</td>
 <td style="text-align: right;">31703</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">NaN</td>
 <td style="text-align: left;">:</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">total_victimization_score</td>
 <td style="text-align: right;">31703</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">NaN</td>
 <td style="text-align: left;">:</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">victimization_risk</td>
 <td style="text-align: right;">31703</td>
 <td style="text-align: right;">0</td>
@@ -713,195 +686,345 @@ The following object is masked from 'package:survival':
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>data_raw <span class="sc">%&gt;%</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="at">recid_missing =</span> <span class="fu">is.na</span>(days_to_recid))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>data_raw <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="at">recid_missing =</span> <span class="fu">is.na</span>(days_to_recid))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  recid_missing     n
-1         FALSE 11699
-2          TRUE 20004</code></pre>
+<pre><code># A tibble: 2 × 2
+  recid_missing     n
+  &lt;lgl&gt;         &lt;int&gt;
+1 FALSE         11699
+2 TRUE          20004</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> data_raw <span class="sc">%&gt;%</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">event =</span> <span class="fu">if_else</span>(<span class="sc">!</span><span class="fu">is.na</span>(days_to_recid), <span class="dv">1</span>, <span class="dv">0</span>),</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">exit_sup_start_date =</span> <span class="fu">as.Date</span>(exit_sup_start_date),</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">censor_date =</span> <span class="fu">as.Date</span>(<span class="fu">paste0</span>(report_fiscal_year, <span class="st">"-06-30"</span>)),</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_days =</span> <span class="fu">if_else</span>(</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      event <span class="sc">==</span> <span class="dv">1</span>,</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>      days_to_recid,</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.numeric</span>(censor_date <span class="sc">-</span> exit_sup_start_date)</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(df<span class="sc">$</span>time_days))                      </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>empty_cols <span class="ot">&lt;-</span> <span class="fu">names</span>(data_raw)[<span class="fu">colSums</span>(<span class="fu">is.na</span>(data_raw)) <span class="sc">==</span> <span class="fu">nrow</span>(data_raw)]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>empty_cols</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0</code></pre>
+<pre><code>[1] "record_id"                 "offender_cd"              
+[3] "birth_date"                "total_violence_score"     
+[5] "violence_risk"             "total_victimization_score"
+[7] "victimization_risk"       </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(df<span class="sc">$</span>time_days)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>data_raw <span class="ot">&lt;-</span> data_raw <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">all_of</span>(empty_cols))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> data_raw <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">event =</span> <span class="fu">if_else</span>(<span class="sc">!</span><span class="fu">is.na</span>(days_to_recid), <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date =</span> <span class="fu">as.Date</span>(exit_sup_end_date),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_days =</span> <span class="fu">if_else</span>(event <span class="sc">==</span> <span class="dv">1</span>, days_to_recid, <span class="dv">1095</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(df<span class="sc">$</span>days_to_recid, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)   </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1095</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(event <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(time_days) <span class="sc">%&gt;%</span> <span class="fu">summary</span>()  </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    0.0   564.5  1385.0  1254.1  1622.0 17787.0 </code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(event <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(time_days) <span class="sc">%&gt;%</span> <span class="fu">summary</span>()   </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-   1101    1411    1555    1725    1768   17787 </code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">chk =</span> report_fiscal_year <span class="sc">-</span> cohort_fiscal_year) <span class="sc">%&gt;%</span> <span class="fu">count</span>(chk)  </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  chk     n
-1   3 31703</code></pre>
+   1095    1095    1095    1095    1095    1095 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unite</span>(<span class="st">"exit_combined"</span>, exit_type, exit_subtype, <span class="at">sep =</span> <span class="st">" - "</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(df<span class="sc">$</span>time_days <span class="sc">==</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)   </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">time_days =</span> <span class="fu">if_else</span>(time_days <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.5</span>, time_days))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">count</span>(sex, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unite</span>(<span class="st">"exit_combined"</span>, exit_type, exit_subtype, <span class="at">sep =</span> <span class="st">" - "</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex           =</span> <span class="fu">factor</span>(sex),</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Race          =</span> <span class="fu">factor</span>(Race),</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">exit_type     =</span> <span class="fu">factor</span>(exit_type),</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">exit_sup      =</span> <span class="fu">factor</span>(exit_sup),</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">risk_ranking  =</span> <span class="fu">factor</span>(</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(<span class="fu">is.na</span>(risk_ranking), <span class="st">"Not assessed"</span>, risk_ranking),</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Low"</span>, <span class="st">"Moderate"</span>, <span class="st">"High"</span>, <span class="st">"Not assessed"</span>)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_c         =</span> age <span class="sc">-</span> <span class="fu">mean</span>(age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(sex))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">recid_rate =</span> <span class="fu">mean</span>(event), <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>     sex     n
-1   Male 27180
-2 Female  4520
-3            3</code></pre>
+<pre><code># A tibble: 1 × 2
+  recid_rate     n
+       &lt;dbl&gt; &lt;int&gt;
+1      0.369 31700</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">count</span>(Race, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(sex)          <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">recid_rate =</span> <span class="fu">mean</span>(event), <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                              Race     n
-1                            White 22186
-2                            Black  6779
-3                         Hispanic  1811
-4 American Indian or Alaska Native   673
-5        Asian or Pacific Islander   247
-6                          Unknown     7</code></pre>
+<pre><code># A tibble: 2 × 3
+  sex    recid_rate     n
+  &lt;fct&gt;       &lt;dbl&gt; &lt;int&gt;
+1 Female      0.300  4520
+2 Male        0.380 27180</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">count</span>(risk_ranking, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  risk_ranking     n
-1         High 15290
-2          Low 10068
-3     Moderate  4776
-4               1569</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">count</span>(exit_combined, <span class="at">sort =</span> <span class="cn">TRUE</span>)     <span class="co"># adjust name</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                         exit_combined    n
-1                   Drug - Trafficking 6790
-2                    Violent - Assault 3927
-3                  Property - Burglary 3431
-4                     Property - Theft 3161
-5               Other - Other Criminal 2719
-6               Drug - Drug Possession 2030
-7                        Violent - Sex 1608
-8             Property - Forgery/Fraud 1549
-9                   Public Order - OWI 1416
-10              Public Order - Weapons  847
-11   Public Order - Other Public Order  726
-12             Violent - Other Violent  701
-13                   Violent - Robbery  605
-14              Public Order - Traffic  530
-15                Property - Vandalism  403
-16       Violent - Murder/Manslaughter  382
-17                    Property - Arson  224
-18                   Drug - Other Drug  215
-19              Public Order - Alcohol  191
-20                    Violent - Kidnap  109
-21        Public Order - Flight/Escape   66
-22               Other - Other Violent   53
-23 Public Order - Prostitution/Pimping    9
-24                     Other - Animals    6
-25          Property - Stolen Property    4
-26            Other - Other Government    1</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">count</span>(exit_sup_reason, <span class="at">sort =</span> <span class="cn">TRUE</span>)              <span class="co"># adjust name</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                      exit_sup_reason     n
-1                      Parole Granted 20551
-2 Discharged - Expiration of Sentence  6959
-3        Released to Special Sentence  1621
-4       Paroled w/Immediate Discharge  1086
-5  Paroled to Detainer - Out of State   482
-6 Paroled to Detainer - U.S. Marshall   446
-7           Paroled to Detainer - INS   288
-8          Paroled to Detainer - Iowa   270</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(df<span class="sc">$</span>age)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-   17.0    28.0    35.0    36.6    43.0    85.0 </code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, <span class="at">fill =</span> <span class="st">"steelblue"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Age at Release"</span>, <span class="at">x =</span> <span class="st">"Age"</span>, <span class="at">y =</span> <span class="st">"Count"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="draft_code_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">recid_rate =</span> <span class="fu">mean</span>(event), <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  recid_rate     n
-1  0.3690187 31703</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">%&gt;%</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">recid_rate =</span> <span class="fu">mean</span>(event), <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  sex      recid_rate     n
-  &lt;chr&gt;         &lt;dbl&gt; &lt;int&gt;
-1 ""            0         3
-2 "Female"      0.300  4520
-3 "Male"        0.380 27180</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(risk_ranking) <span class="sc">%&gt;%</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">recid_rate =</span> <span class="fu">mean</span>(event), <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(risk_ranking) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">recid_rate =</span> <span class="fu">mean</span>(event), <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 3
   risk_ranking recid_rate     n
-  &lt;chr&gt;             &lt;dbl&gt; &lt;int&gt;
-1 ""                0.266  1569
-2 "High"            0.420 15290
-3 "Low"             0.314 10068
-4 "Moderate"        0.356  4776</code></pre>
+  &lt;fct&gt;             &lt;dbl&gt; &lt;int&gt;
+1 Low               0.314 10068
+2 Moderate          0.356  4776
+3 High              0.420 15290
+4 Not assessed      0.266  1566</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(exit_type)    <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">recid_rate =</span> <span class="fu">mean</span>(event), <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 3
+  exit_type    recid_rate     n
+  &lt;fct&gt;             &lt;dbl&gt; &lt;int&gt;
+1 Drug              0.407  9035
+2 Other             0.503  2779
+3 Property          0.374  8771
+4 Public Order      0.318  3784
+5 Violent           0.292  7331</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(exit_sup)     <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">recid_rate =</span> <span class="fu">mean</span>(event), <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  exit_sup     recid_rate     n
+  &lt;fct&gt;             &lt;dbl&gt; &lt;int&gt;
+1 Prison            0.347 23071
+2 Work Release      0.429  8629</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Race)         <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">recid_rate =</span> <span class="fu">mean</span>(event), <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  Race                             recid_rate     n
+  &lt;fct&gt;                                 &lt;dbl&gt; &lt;int&gt;
+1 American Indian or Alaska Native      0.447   673
+2 Asian or Pacific Islander             0.320   247
+3 Black                                 0.355  6779
+4 Hispanic                              0.305  1811
+5 Unknown                               0         4
+6 White                                 0.377 22186</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)  </span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>pt <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time_days) <span class="sc">%&gt;%</span></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>())</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1150</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">20.5</span>),</span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Days since release"</span>, <span class="at">ylab =</span> <span class="st">"Individual"</span>, <span class="at">yaxt =</span> <span class="st">"n"</span>,</span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Time to Reincarceration: Events vs. Censoring"</span>)</span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, <span class="at">labels =</span> <span class="fu">paste0</span>(<span class="st">"P"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>), <span class="at">cex.axis =</span> <span class="fl">0.7</span>)</span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1095</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"grey60"</span>)            <span class="co"># 3-year tracking cutoff</span></span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="dv">1095</span>, <span class="fl">20.4</span>, <span class="st">"3-yr cutoff"</span>, <span class="at">pos =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"grey40"</span>, <span class="at">cex =</span> <span class="fl">0.8</span>)</span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) {</span>
-<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(<span class="dv">0</span>, pt<span class="sc">$</span>id[i], pt<span class="sc">$</span>time_days[i], pt<span class="sc">$</span>id[i], <span class="at">col =</span> <span class="st">"#3a86d4"</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span>
-<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (pt<span class="sc">$</span>event[i] <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">points</span>(pt<span class="sc">$</span>time_days[i], pt<span class="sc">$</span>id[i], <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"#d1495b"</span>, <span class="at">cex =</span> <span class="fl">1.4</span>)   </span>
-<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">points</span>(pt<span class="sc">$</span>time_days[i], pt<span class="sc">$</span>id[i], <span class="at">pch =</span> <span class="st">"&gt;"</span>, <span class="at">col =</span> <span class="st">"#3a86d4"</span>, <span class="at">cex =</span> <span class="fl">1.4</span>) </span>
-<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="at">bty =</span> <span class="st">"n"</span>,</span>
-<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"recidivated (event)"</span>, <span class="st">"censored (no return by cutoff)"</span>),</span>
-<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">19</span>, <span class="dv">62</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#d1495b"</span>, <span class="st">"#3a86d4"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(event <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> survival_time_months)) <span class="sc">+</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">fill =</span> <span class="st">"#d1495b"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"When Does Reincarceration Occur?"</span>,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Months to reincarceration"</span>, <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="draft_code_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="draft_code_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20</span>)  </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>pt <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time_days) <span class="sc">%&gt;%</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>())</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1200</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">20.5</span>),</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Days since release"</span>, <span class="at">ylab =</span> <span class="st">"Individual"</span>, <span class="at">yaxt =</span> <span class="st">"n"</span>,</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Time to Reincarceration: Events vs. Censoring"</span>)</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, <span class="at">labels =</span> <span class="fu">paste0</span>(<span class="st">"P"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>), <span class="at">cex.axis =</span> <span class="fl">0.7</span>)</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1095</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"grey60"</span>)            </span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="dv">1095</span>, <span class="fl">20.4</span>, <span class="st">"3-yr cutoff"</span>, <span class="at">pos =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"grey40"</span>, <span class="at">cex =</span> <span class="fl">0.8</span>)</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) {</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(<span class="dv">0</span>, pt<span class="sc">$</span>id[i], pt<span class="sc">$</span>time_days[i], pt<span class="sc">$</span>id[i], <span class="at">col =</span> <span class="st">"#3a86d4"</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (pt<span class="sc">$</span>event[i] <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">points</span>(pt<span class="sc">$</span>time_days[i], pt<span class="sc">$</span>id[i], <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"#d1495b"</span>, <span class="at">cex =</span> <span class="fl">1.4</span>)   </span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">points</span>(pt<span class="sc">$</span>time_days[i], pt<span class="sc">$</span>id[i], <span class="at">pch =</span> <span class="st">"&gt;"</span>, <span class="at">col =</span> <span class="st">"#3a86d4"</span>, <span class="at">cex =</span> <span class="fl">1.4</span>) </span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="at">bty =</span> <span class="st">"n"</span>,</span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"recidivated (event)"</span>, <span class="st">"censored (no return by cutoff)"</span>),</span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">19</span>, <span class="dv">62</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#d1495b"</span>, <span class="st">"#3a86d4"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="draft_code_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>km_risk <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> risk_ranking, <span class="at">data =</span> df)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(km_risk, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>), <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Days since release"</span>, <span class="at">ylab =</span> <span class="st">"Probability of remaining in community"</span>,</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Time to Reincarceration by Risk Classification"</span>)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">levels</span>(df<span class="sc">$</span>risk_ranking),</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="draft_code_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>km_risk <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> exit_type, <span class="at">data =</span> df)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(km_risk, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>), <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Days since release"</span>, <span class="at">ylab =</span> <span class="st">"Probability of remaining in community"</span>,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Time to Reincarceration by Offense Type"</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">levels</span>(df<span class="sc">$</span>exit_type),</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="draft_code_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> exit_type, <span class="at">data =</span> df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+survdiff(formula = Surv(time_days, event) ~ exit_type, data = df)
+
+                          N Observed Expected (O-E)^2/E (O-E)^2/V
+exit_type=Drug         9035     3678     3272     50.46     70.09
+exit_type=Other        2779     1398      915    255.58    277.52
+exit_type=Property     8771     3279     3213      1.37      1.89
+exit_type=Public Order 3784     1202     1446     41.04     46.85
+exit_type=Violent      7331     2142     2855    177.85    235.47
+
+ Chisq= 527  on 4 degrees of freedom, p= &lt;2e-16 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>km_risk <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> sex, <span class="at">data =</span> df)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(km_risk, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>), <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Days since release"</span>, <span class="at">ylab =</span> <span class="st">"Probability of remaining in community"</span>,</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Time to Reincarceration by Sex"</span>)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">levels</span>(df<span class="sc">$</span>sex),</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="draft_code_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> sex, <span class="at">data =</span> df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+survdiff(formula = Surv(time_days, event) ~ sex, data = df)
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+sex=Female  4520     1358     1740      83.8      98.5
+sex=Male   27180    10341     9959      14.6      98.5
+
+ Chisq= 98.5  on 1 degrees of freedom, p= &lt;2e-16 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>km_risk <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> exit_sup, <span class="at">data =</span> df)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(km_risk, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>), <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Days since release"</span>, <span class="at">ylab =</span> <span class="st">"Probability of remaining in community"</span>,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Time to Reincarceration by Release Type"</span>)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">levels</span>(df<span class="sc">$</span>exit_sup),</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="draft_code_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> exit_sup, <span class="at">data =</span> df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+survdiff(formula = Surv(time_days, event) ~ exit_sup, data = df)
+
+                          N Observed Expected (O-E)^2/E (O-E)^2/V
+exit_sup=Prison       23071     8001     8693      55.1       215
+exit_sup=Work Release  8629     3698     3006     159.3       215
+
+ Chisq= 215  on 1 degrees of freedom, p= &lt;2e-16 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> risk_ranking, <span class="at">data =</span> df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+survdiff(formula = Surv(time_days, event) ~ risk_ranking, data = df)
+
+                              N Observed Expected (O-E)^2/E (O-E)^2/V
+risk_ranking=Low          10068     3159     3861    127.55    190.52
+risk_ranking=Moderate      4776     1699     1786      4.23      4.99
+risk_ranking=High         15290     6424     5446    175.77    329.17
+risk_ranking=Not assessed  1566      417      607     59.33     62.61
+
+ Chisq= 367  on 3 degrees of freedom, p= &lt;2e-16 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> exit_type,    <span class="at">data =</span> df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+survdiff(formula = Surv(time_days, event) ~ exit_type, data = df)
+
+                          N Observed Expected (O-E)^2/E (O-E)^2/V
+exit_type=Drug         9035     3678     3272     50.46     70.09
+exit_type=Other        2779     1398      915    255.58    277.52
+exit_type=Property     8771     3279     3213      1.37      1.89
+exit_type=Public Order 3784     1202     1446     41.04     46.85
+exit_type=Violent      7331     2142     2855    177.85    235.47
+
+ Chisq= 527  on 4 degrees of freedom, p= &lt;2e-16 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> sex,          <span class="at">data =</span> df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+survdiff(formula = Surv(time_days, event) ~ sex, data = df)
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+sex=Female  4520     1358     1740      83.8      98.5
+sex=Male   27180    10341     9959      14.6      98.5
+
+ Chisq= 98.5  on 1 degrees of freedom, p= &lt;2e-16 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(time_days, event) <span class="sc">~</span> exit_sup,     <span class="at">data =</span> df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+survdiff(formula = Surv(time_days, event) ~ exit_sup, data = df)
+
+                          N Observed Expected (O-E)^2/E (O-E)^2/V
+exit_sup=Prison       23071     8001     8693      55.1       215
+exit_sup=Work Release  8629     3698     3006     159.3       215
+
+ Chisq= 215  on 1 degrees of freedom, p= &lt;2e-16 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(km_risk, <span class="at">fun =</span> <span class="st">"cloglog"</span>,</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>), <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Days since release (log scale)"</span>,</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"log(-log(Survival))"</span>,</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Log-Minus-Log Plot: Risk Classification"</span>)</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">levels</span>(df<span class="sc">$</span>risk_ranking),</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a9d8f"</span>, <span class="st">"#e9c46a"</span>, <span class="st">"#d1495b"</span>, <span class="st">"grey60"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="draft_code_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

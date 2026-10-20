@@ -1,7 +1,7 @@
 ---
-title: "Writing a great story for data science projects "
+title: "Writing a great story for data science projects"
 subtitle: "This is a Report Template Quarto"
-author: "Aliyah Hunter & Sophia Craig (Advisor: Dr. Cohen)"
+author: "Aliyah Hunter & Sophia Bamman Craig (Advisor: Dr. Cohen)"
 date: '`r Sys.Date()`'
 format:
   html:
@@ -23,7 +23,15 @@ to edit)
 
 
 ## Introduction
+In many studies, the outcome of interest is not only whether an event occurs, but also how long it takes for that event to happen. For example, researchers may be interested in how long a patient survives after treatment, when a borrower defaults on a loan, or when a user leaves a website. Survival analysis considers both whether an event occurs and the time until it occurs, while accounting for censored observations.
 
+The Cox proportional hazards model is one of the most commonly used methods for analyzing time-to-event data. The model allows researchers to examine how different variables are related to the risk of experiencing an event over time. Because of this, Cox regression can be applied to many different types of research questions. Previous studies have used Cox models to examine the duration of the birth process [@Wuryandari2018], the time until farmers are willing to pay agricultural insurance premiums [@Hidayat2022], website drop-offs [@Soobramoney2023], credit default [@Dirick2017], and survival following cancer treatments [@Abadi2014]. Although these studies focus on very different outcomes, they all use the same general idea of examining the time until a specific event occurs.
+
+An important part of using the Cox model is the proportional hazards assumption. This assumption means that the effect of a predictor on the hazard is expected to remain proportional over time. For example, if one group has a higher risk of experiencing an event than another group, the model assumes that the relative difference between those groups remains consistent throughout the study period. If that relationship changes over time, a single hazard ratio may not accurately describe the effect of the predictor.
+
+Because of this, the proportional hazards assumption should be evaluated before the results of a Cox model are interpreted. However, this does not always happen in practice. Reviews of pediatric leukemia and total joint arthroplasty studies found that the proportional hazards assumption was often not reported or was not adequately evaluated [@Kuitunen2021]; [@Kuitunen2023]. Bellera et al. also emphasized that researchers should investigate whether effects change over time rather than automatically assuming that proportional hazards are present [@Bellera2018].
+
+When the proportional hazards assumption is violated, the standard Cox model may not be the best representation of the data. Researchers can use modifications such as stratification or time-dependent effects to account for relationships that change throughout the study period. However, the performance of these approaches can also depend on factors such as sample size, censoring, and the distribution of survival times [Iketle2024]. Overall, the Cox proportional hazards model provides a useful and flexible way to analyze time-to-event outcomes, but its results depend on appropriately accounting for censored observations and evaluating whether the proportional hazards assumption is reasonable for the data.
 
 
 ### Literature Review
@@ -91,14 +99,13 @@ Alternatively, predictor-by-time interactions allow associations to be estimated
 ## Analysis and Results
 
 ### Data Exploration and Visualization
+The Iowa Prison Recidivism Status dataset contains 31,703 case-level records of individuals released from Iowa prisons through parole, work release, or discharge, beginning with the FY2016 cohort. It covers releases from July 2015 through June 2022 and tracks whether each individual was reincarcerated. Available variables include age, sex, race, the original offense, the convicting offense on recidivism if one occurred, and a risk classification.
 
--   Describe your data sources and collection process.
+This analysis looks at reincarceration outcomes for 31,700 individuals who were followed for up to three years after release, three cases removed due to sex and race being unknown. The overall reincarceration rate was 36.9%, but this rate varied across demographic and offense-based subgroups. Violent offenders had the lowest rate at 29.2%, while individuals convicted of "other" offenses had the highest at 50.3%. This goes against a common assumption that more severe offenses lead to worse reentry outcomes. The timing of reincarceration also showed a clear pattern. Among release records with observed reincarceration, the average time to reincarceration is 449 days, and the rate of return leveled off after that point.
 
--   Present initial findings and insights through visualizations.
+Differences appeared across several other groups as well. Males were reincarcerated at a rate about 8 percentage points higher than females (38.0% vs. 30.0%). American Indian or Alaska Native individuals had the highest rate of any racial group at 44.7%. Risk classification separated outcomes as intended, with high risk individuals reincarcerated at a rate of 42.0% compared to 31.4% for low risk individuals. However, individuals who were never formally assessed had a lower rate than the low risk group. This might indicate some bias as the reason for the missing risk is unknown.
 
--   Highlight unexpected patterns or anomalies.
-
-
+The eight release supervision types in the data also produced different outcomes. Individuals discharged at the expiration of their sentence had survival probabilities staying above 70% across the full three year period. Those paroled with immediate discharge and those released to special sentences had survival probabilities falling below 60% within the first year. Individuals granted parole, who made up the largest group at 20,551, fell in between. These differences suggest that release type may be more than a marker of underlying offender characteristics, and that supervision conditions themselves could shape reentry outcomes.
 
 ```{r, warning=FALSE, echo=T, message=FALSE}
 # loading packages 
@@ -110,21 +117,20 @@ library(dslabs)
 library(survival)
 library(survminer)
 library(skimr)  
+library(RColorBrewer)
 ```
-
 ```{r, warning=FALSE, echo=TRUE}
 # Load Data
 data_raw <- read_csv("ipr_dataset.csv", na = c("", "NA"))
-
 # Data Cleaning
 empty_cols <- names(data_raw)[colSums(is.na(data_raw)) == nrow(data_raw)]
-data_raw <- data_raw %>% select(-all_of(empty_cols))
+data <- data_raw %>% select(-all_of(empty_cols))
 
-df <- data_raw %>%
+df <- data %>%
   mutate(
-    event = if_else(!is.na(days_to_recid), 1, 0),
+    event = as.integer(is_recid),
     release_date = as.Date(exit_sup_end_date),
-    time_days = if_else(event == 1, days_to_recid, 1095)
+    time_days = if_else(event == 1L, days_to_recid, 1095),                             # Assign observed event times; censor non-events at 1095 days
   )
 
 df <- df %>% mutate(time_days = if_else(time_days == 0, 0.5, time_days))
@@ -132,22 +138,54 @@ df <- df %>% mutate(time_days = if_else(time_days == 0, 0.5, time_days))
 df <- df %>%
   unite("exit_combined", exit_type, exit_subtype, sep = " - ", remove = FALSE) %>%
   mutate(
-    sex           = factor(sex),
-    Race          = factor(Race),
-    exit_type     = factor(exit_type),
-    exit_sup      = factor(exit_sup),
-    risk_ranking  = factor(
-      if_else(is.na(risk_ranking), "Not assessed", risk_ranking),
-      levels = c("Low", "Moderate", "High", "Not assessed")
+    sex               = factor(sex),
+    Race              = factor(Race),
+    exit_type         = factor(exit_type),
+    exit_sup_reason   = factor(exit_sup_reason),
+    risk_ranking      = factor(
+      if_else(is.na(risk_ranking), "Not Assessed", risk_ranking),
+      levels = c("Low", "Moderate", "High", "Not Assessed")
     ),
+    filter(!is.na(sex)),
     age_c         = age - mean(age, na.rm = TRUE)
   )
-df <- df %>% filter(!is.na(sex))
 ```
 
-```{r}
+```{r data-clean result, echo=TRUE}
+data_raw |>
+  nrow()  # 31703 original records before cleaning
+data_raw |>
+  filter(is.na(sex)) 
+
+df |>
+  nrow()  # 31700 records analyzed - 3 removed due to sex and race being NA
+
+data_raw |>
+  summarise(
+    same_day_events = sum(
+      is_recid == TRUE & days_to_recid == 0,
+      na.rm = TRUE
+    )
+  )  
+df |>
+  filter(event == 1, days_to_recid == 0) |>           # Six records had reincarceration recorded on the day of release; analysis times were assigned 0.5 days to represent same-day events.
+  select(days_to_recid, time_days, event)
+
+df |>
+  filter(event == 1) |>
+  summarise(mean_days = mean(time_days, na.rm = TRUE))
+
+df |>
+  summarise(
+    recid_rate = mean(event, na.rm = TRUE) * 100
+  )
+
+
+```
+
+```{r - histo plot}
 df %>%
-  filter(event == 1) %>%
+  filter(event == 1L) %>%
   ggplot(aes(x = survival_time_months)) +
   geom_histogram(binwidth = 1, fill = "#d1495b", color = "white") +
   labs(title = "When Does Reincarceration Occur?",
@@ -155,7 +193,7 @@ df %>%
   theme_minimal()
 ```
 
-```{r}
+```{r - time plot}
 set.seed(20)  
 
 pt <- df %>%
@@ -178,62 +216,172 @@ for (i in 1:20) {
     points(pt$time_days[i], pt$id[i], pch = ">", col = "#3a86d4", cex = 1.4) 
   }
 }
-legend("bottomright", bty = "n",
-       legend = c("recidivated (event)", "censored (no return by cutoff)"),
-       pch = c(19, 62), col = c("#d1495b", "#3a86d4"))
+legend("bottomright",
+       inset = 0,
+       cex = 0.8,
+       bty = "n",
+       legend = c("Reincarceration", "Censored (no return by cutoff)"),
+       pch = c(19, 62),
+       col = c("#d1495b", "#3a86d4"))
 ```
-```{r}
+```{r - Kaplan–Meier model 1}
 km_risk <- survfit(Surv(time_days, event) ~ risk_ranking, data = df)
 
 plot(km_risk, col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
-     xlab = "Days since release", ylab = "Probability of remaining in community",
+     xlab = "Days since release", ylab = "Probability of remaining free of reincarceration",
+     xlim = c(0, 1095), ylim = c(0, 1),
      main = "Time to Reincarceration by Risk Classification")
 legend("bottomleft", bty = "n", lwd = 2,
        legend = levels(df$risk_ranking),
+       cex = 0.8,
        col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
+       
+survdiff(Surv(time_days, event) ~ risk_ranking, data = df)
 ```
 
-```{r}
-km_risk <- survfit(Surv(time_days, event) ~ exit_type, data = df)
+```{r - Kaplan–Meier model 2}
+km_exit <- survfit(Surv(time_days, event) ~ exit_type, data = df)
 
-plot(km_risk, col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
-     xlab = "Days since release", ylab = "Probability of remaining in community",
+colors <- brewer.pal(8, "Dark2")
+group_labels <- sub("^[^=]+=", "", names(km_exit$strata))
+
+plot(km_exit, col = colors, lwd = 2,
+     xlab = "Days since release", ylab = "Probability of remaining free of reincarceration",
+     xlim = c(0, 1095), ylim = c(0, 1),
      main = "Time to Reincarceration by Offense Type")
 legend("bottomleft", bty = "n", lwd = 2,
-       legend = levels(df$exit_type),
-       col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
+       legend = group_labels,
+       cex = 0.8,
+       col = colors)
 
 survdiff(Surv(time_days, event) ~ exit_type, data = df)
 ```
 
-```{r}
-km_risk <- survfit(Surv(time_days, event) ~ sex, data = df)
+```{r - Kaplan–Meier model 3}
+km_sex <- survfit(Surv(time_days, event) ~ sex, data = df)
 
-plot(km_risk, col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
-     xlab = "Days since release", ylab = "Probability of remaining in community",
+plot(km_sex, col = c("#2a9d8f", "#d1495b"), lwd = 2,
+     xlab = "Days since release", ylab = "Probability of remaining free of reincarceration",
+     xlim = c(0, 1095), ylim = c(0, 1),
      main = "Time to Reincarceration by Sex")
 legend("bottomleft", bty = "n", lwd = 2,
        legend = levels(df$sex),
-       col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
+       cex = 0.8,
+       col = c("#2a9d8f", "#d1495b"))
 
 survdiff(Surv(time_days, event) ~ sex, data = df)
 ```
 
 
-```{r}
-km_risk <- survfit(Surv(time_days, event) ~ exit_sup, data = df)
+```{r - Kaplan–Meier model 4} 
+km_exit_reason <- survfit(Surv(time_days, event) ~ exit_sup_reason, data = df)
 
-plot(km_risk, col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"), lwd = 2,
-     xlab = "Days since release", ylab = "Probability of remaining in community",
-     main = "Time to Reincarceration by Release Type")
+colors <- brewer.pal(8, "Dark2")
+labels <- sub("^[^=]+=", "", names(km_exit_reason$strata))
+
+plot(km_exit_reason, col = colors, lwd = 2,
+     xlab = "Days since release", ylab = "Probability of remaining free of reincarceration", 
+     xlim = c(0, 1095), ylim = c(0, 1),
+     main = "Time to Reincarceration by Release Reason")
 legend("bottomleft", bty = "n", lwd = 2,
-       legend = levels(df$exit_sup),
-       col = c("#2a9d8f", "#e9c46a", "#d1495b", "grey60"))
-
-survdiff(Surv(time_days, event) ~ exit_sup, data = df)
+       legend = labels,
+       cex = 0.8,
+       col = colors)
+survdiff(Surv(time_days, event) ~ exit_sup_reason, data = df)
 ```
 
+```{r - log rank table}
+logrank_tests <- list(
+  "Risk classification" = survdiff(
+    Surv(time_days, event) ~ risk_ranking, data = df
+  ),
+  "Offense type" = survdiff(
+    Surv(time_days, event) ~ exit_type, data = df
+  ),
+  "Sex" = survdiff(
+    Surv(time_days, event) ~ sex, data = df
+  ),
+  "Release reason" = survdiff(
+    Surv(time_days, event) ~ exit_sup_reason, data = df
+  )
+)
 
+logrank_table <- imap_dfr(logrank_tests, function(test, comparison) {
+  degrees_freedom <- sum(test$exp > 0) - 1
+
+  tibble(
+    comparison = comparison,
+    chi_square = test$chisq,
+    df = degrees_freedom,
+    p_value = pchisq(
+      test$chisq,
+      df = degrees_freedom,
+      lower.tail = FALSE
+    )
+  )
+})
+
+logrank_table |>
+  mutate(
+    chi_square = round(chi_square, 2),
+    p_value = if_else(
+      p_value < 0.001,
+      "<0.001",
+      sprintf("%.3f", p_value)
+    )
+  ) |>
+  knitr::kable(
+    col.names = c(
+      "Comparison",
+      "Chi-square",
+      "Degrees of freedom",
+      "Overall p-value"
+    ),
+    caption = "Log-Rank Tests",
+    align = c("l", "r", "r", "r")
+  )
+  # Log-rank tests indicated significant differences in time to reincarceration across risk classifications, offense types, sex, and release reasons (all p < 0.001)
+```
+
+```{r - cox model 1}
+cox_model <- coxph(
+  Surv(time_days, event) ~
+    age_c +
+    sex +
+    risk_ranking +
+    exit_type +
+    exit_sup_reason,
+  data = df,
+  ties = "efron",
+  x = TRUE
+)
+
+summary(cox_model)
+
+ph_check <- cox.zph(cox_model)
+
+ph_check
+plot(ph_check)
+# assumptions violated especially for release reason - stratify by release reason to allow each category its own baseline
+cox_stratified <- coxph(
+  Surv(time_days, event) ~
+    age_c +
+    sex +
+    risk_ranking +
+    exit_type +
+    strata(exit_sup_reason),
+  data = df,
+  ties = "efron",
+  x = TRUE
+)
+
+summary(cox_stratified)
+
+ph_stratified <- cox.zph(cox_stratified)
+ph_stratified
+plot(ph_stratified)
+
+```
 ### Modeling and Results
 
 -   Explain your data preprocessing and cleaning steps.
