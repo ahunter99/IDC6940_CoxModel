@@ -1,6 +1,6 @@
 ---
-title: "Writing a great story for data science projects"
-subtitle: "This is a Report Template Quarto"
+title: "Time to Reincarceration in Iowa:"
+subtitle: "A Cox Proportional Hazards Analysis"
 author: "Aliyah Hunter & Sophia Bamman Craig (Advisor: Dr. Cohen)"
 date: '`r Sys.Date()`'
 format:
@@ -25,14 +25,15 @@ to edit)
 ## Introduction
 In many studies, the outcome of interest is not only whether an event occurs, but also how long it takes for that event to happen. For example, researchers may be interested in how long a patient survives after treatment, when a borrower defaults on a loan, or when a user leaves a website. Survival analysis considers both whether an event occurs and the time until it occurs, while accounting for censored observations.
 
-The Cox proportional hazards model is one of the most commonly used methods for analyzing time-to-event data. The model allows researchers to examine how different variables are related to the risk of experiencing an event over time. Because of this, Cox regression can be applied to many different types of research questions. Previous studies have used Cox models to examine the duration of the birth process [@Wuryandari2018], the time until farmers are willing to pay agricultural insurance premiums [@Hidayat2022], website drop-offs [@Soobramoney2023], credit default [@Dirick2017], and survival following cancer treatments [@Abadi2014]. Although these studies focus on very different outcomes, they all use the same general idea of examining the time until a specific event occurs.
+The Cox proportional hazards model is one of the most commonly used methods for analyzing time-to-event data. The model allows researchers to examine how different variables are related to the risk of experiencing an event over time. Because of this, Cox regression can be applied to many different types of research questions. Previous studies have used Cox models to examine the duration of the birth process [@wuryandari2018], the time until farmers are willing to pay agricultural insurance premiums [@hidayat2022], website drop-offs [@soobramoney2023], credit default [@dirick2017], and survival following cancer treatments [@abadi2014]. Although these studies focus on very different outcomes, they all use the same general idea of examining the time until a specific event occurs.
 
 An important part of using the Cox model is the proportional hazards assumption. This assumption means that the effect of a predictor on the hazard is expected to remain proportional over time. For example, if one group has a higher risk of experiencing an event than another group, the model assumes that the relative difference between those groups remains consistent throughout the study period. If that relationship changes over time, a single hazard ratio may not accurately describe the effect of the predictor.
 
-Because of this, the proportional hazards assumption should be evaluated before the results of a Cox model are interpreted. However, this does not always happen in practice. Reviews of pediatric leukemia and total joint arthroplasty studies found that the proportional hazards assumption was often not reported or was not adequately evaluated [@Kuitunen2021]; [@Kuitunen2023]. Bellera et al. also emphasized that researchers should investigate whether effects change over time rather than automatically assuming that proportional hazards are present [@Bellera2018].
+Because of this, the proportional hazards assumption should be evaluated before the results of a Cox model are interpreted. However, this does not always happen in practice. Reviews of pediatric leukemia and total joint arthroplasty studies found that the proportional hazards assumption was often not reported or was not adequately evaluated [@kuitunen2021]; [@kuitunen2023]. Bellera et al. also emphasized that researchers should investigate whether effects change over time rather than automatically assuming that proportional hazards are present [@bellera2018].
 
 When the proportional hazards assumption is violated, the standard Cox model may not be the best representation of the data. Researchers can use modifications such as stratification or time-dependent effects to account for relationships that change throughout the study period. However, the performance of these approaches can also depend on factors such as sample size, censoring, and the distribution of survival times [Iketle2024]. Overall, the Cox proportional hazards model provides a useful and flexible way to analyze time-to-event outcomes, but its results depend on appropriately accounting for censored observations and evaluating whether the proportional hazards assumption is reasonable for the data.
 
+This study applies the Cox proportional hazards model to the Iowa Prison Recidivism Status data, which follow 31,700 people released from Iowa prisons for up to three years. We ask which demographic, offense, risk, and release characteristics are associated with time to reincarceration, whether the proportional hazards assumption holds, and how the results change when violations are addressed through stratification and time-period effects.
 
 ### Literature Review
 #### Cox PH model across domains
@@ -119,6 +120,7 @@ library(survminer)
 library(skimr)  
 library(RColorBrewer)
 ```
+
 ```{r, warning=FALSE, echo=TRUE}
 # Load Data
 data_raw <- read_csv("ipr_dataset.csv", na = c("", "NA"))
@@ -137,6 +139,7 @@ df <- df %>% mutate(time_days = if_else(time_days == 0, 0.5, time_days))
 
 df <- df %>%
   unite("exit_combined", exit_type, exit_subtype, sep = " - ", remove = FALSE) %>%
+  filter(!is.na(sex)) %>%
   mutate(
     sex               = factor(sex),
     Race              = factor(Race),
@@ -146,8 +149,7 @@ df <- df %>%
       if_else(is.na(risk_ranking), "Not Assessed", risk_ranking),
       levels = c("Low", "Moderate", "High", "Not Assessed")
     ),
-    filter(!is.na(sex)),
-    age_c         = age - mean(age, na.rm = TRUE)
+    age_c             = age - mean(age, na.rm = TRUE)
   )
 ```
 
@@ -384,7 +386,7 @@ plot(ph_stratified)
 ```
 ### Modeling and Results
 
--   Explain your data preprocessing and cleaning steps.
+The dataset contained 31,703 release records. Three records with missing sex were removed, leaving 31,700 (11,699 reincarcerations). Time to event was days from release to reincarceration; individuals with no return were right-censored at 1,095 days (three years). Six people reincarcerated on the day of release had their time set to 0.5 days so they remained in the risk set. Age was centered at the sample mean ([mean] years), so its hazard ratio reflects a one-year difference from the average. Missing risk classification (n = 1,566) was retained as a “Not Assessed” category. Reference levels were female, Low risk, Drug offense, and discharge at expiration of sentence.
 
 -   Present your key findings in a clear and concise manner.
 
