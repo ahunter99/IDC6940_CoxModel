@@ -21,45 +21,180 @@ editor:
 Slides: [slides.html](slides.html){target="_blank"} ( Go to `slides.qmd`
 to edit)
 
-
 ## Introduction
-In many studies, the outcome of interest is not only whether an event occurs, but also how long it takes for that event to happen. For example, researchers may be interested in how long a patient survives after treatment, when a borrower defaults on a loan, or when a user leaves a website. Survival analysis considers both whether an event occurs and the time until it occurs, while accounting for censored observations.
 
-The Cox proportional hazards model is one of the most commonly used methods for analyzing time-to-event data. The model allows researchers to examine how different variables are related to the risk of experiencing an event over time. Because of this, Cox regression can be applied to many different types of research questions. Previous studies have used Cox models to examine the duration of the birth process [@wuryandari2018], the time until farmers are willing to pay agricultural insurance premiums [@hidayat2022], website drop-offs [@soobramoney2023], credit default [@dirick2017], and survival following cancer treatments [@abadi2014]. Although these studies focus on very different outcomes, they all use the same general idea of examining the time until a specific event occurs.
+In many studies, the outcome of interest is not only whether an event
+occurs, but also how long it takes for that event to happen. For
+example, researchers may be interested in how long a patient survives
+after treatment, when a borrower defaults on a loan, or when a user
+leaves a website. Survival analysis considers both whether an event
+occurs and the time until it occurs, while accounting for censored
+observations.
 
-An important part of using the Cox model is the proportional hazards assumption. This assumption means that the effect of a predictor on the hazard is expected to remain proportional over time. For example, if one group has a higher risk of experiencing an event than another group, the model assumes that the relative difference between those groups remains consistent throughout the study period. If that relationship changes over time, a single hazard ratio may not accurately describe the effect of the predictor.
+The Cox proportional hazards model is one of the most commonly used
+methods for analyzing time-to-event data. The model allows researchers
+to examine how different variables are related to the risk of
+experiencing an event over time. Because of this, Cox regression can be
+applied to many different types of research questions. Previous studies
+have used Cox models to examine the duration of the birth process
+[@wuryandari2018], the time until farmers are willing to pay
+agricultural insurance premiums [@hidayat2022], website drop-offs
+[@soobramoney2023], credit default [@dirick2017], and survival following
+cancer treatments [@abadi2014]. Although these studies focus on very
+different outcomes, they all use the same general idea of examining the
+time until a specific event occurs.
 
-Because of this, the proportional hazards assumption should be evaluated before the results of a Cox model are interpreted. However, this does not always happen in practice. Reviews of pediatric leukemia and total joint arthroplasty studies found that the proportional hazards assumption was often not reported or was not adequately evaluated [@kuitunen2021]; [@kuitunen2023]. Bellera et al. also emphasized that researchers should investigate whether effects change over time rather than automatically assuming that proportional hazards are present [@bellera2010].
+An important part of using the Cox model is the proportional hazards
+assumption. This assumption means that the effect of a predictor on the
+hazard is expected to remain proportional over time. For example, if one
+group has a higher risk of experiencing an event than another group, the
+model assumes that the relative difference between those groups remains
+consistent throughout the study period. If that relationship changes
+over time, a single hazard ratio may not accurately describe the effect
+of the predictor.
 
-When the proportional hazards assumption is violated, the standard Cox model may not be the best representation of the data. Researchers can use modifications such as stratification or time-dependent effects to account for relationships that change throughout the study period. However, the performance of these approaches can also depend on factors such as sample size, censoring, and the distribution of survival times [Iketle2024]. Overall, the Cox proportional hazards model provides a useful and flexible way to analyze time-to-event outcomes, but its results depend on appropriately accounting for censored observations and evaluating whether the proportional hazards assumption is reasonable for the data.
+Because of this, the proportional hazards assumption should be evaluated
+before the results of a Cox model are interpreted. However, this does
+not always happen in practice. Reviews of pediatric leukemia and total
+joint arthroplasty studies found that the proportional hazards
+assumption was often not reported or was not adequately evaluated
+[@kuitunen2021]; [@kuitunen2023]. Bellera et al. also emphasized that
+researchers should investigate whether effects change over time rather
+than automatically assuming that proportional hazards are present
+[@bellera2010].
 
-This study applies the Cox proportional hazards model to the Iowa Prison Recidivism Status data, which follow 31,700 people released from Iowa prisons for up to three years. We ask which demographic, offense, risk, and release characteristics are associated with time to reincarceration, whether the proportional hazards assumption holds, and how the results change when violations are addressed through stratification and time-period effects.
+When the proportional hazards assumption is violated, the standard Cox
+model may not be the best representation of the data. Researchers can
+use modifications such as stratification or time-dependent effects to
+account for relationships that change throughout the study period.
+However, the performance of these approaches can also depend on factors
+such as sample size, censoring, and the distribution of survival times
+\[Iketle2024\]. Overall, the Cox proportional hazards model provides a
+useful and flexible way to analyze time-to-event outcomes, but its
+results depend on appropriately accounting for censored observations and
+evaluating whether the proportional hazards assumption is reasonable for
+the data.
+
+This study applies the Cox proportional hazards model to the Iowa Prison
+Recidivism Status data, which follow 31,700 people released from Iowa
+prisons for up to three years. We ask which demographic, offense, risk,
+and release characteristics are associated with time to reincarceration,
+whether the proportional hazards assumption holds, and how the results
+change when violations are addressed through stratification and
+time-period effects.
 
 ### Literature Review
+
 #### Cox PH model across domains
-Empirical studies have shown that the Cox PH model can be used well beyond its origin in clinical survival analysis. The studies reviewed for this project applied the model to academic performance, childbirth, agricultural economics, website use, and credit risk. Thus, the model could be used in any setting that has time-to-event data with censoring. In a study on medical student attrition, a stepwise Cox model was used to examine which academic and demographic factors predicted when a student would experience academic difficulty. Researchers found that curriculum track, MCAT verbal reasoning scores, and early course failures were the strongest predictors, and that the risk peaked at a specific point in the training timeline [@chau-kuang2010]. In a study on the duration of childbirth, Cox PH was used to examine whether a specific birth-preparation method changed the time it took to deliver. The study found that this method significantly shortened the time to delivery compared to standard practice [@wuryandari2018]. [@hidayat2022] applied Cox PH to model economic behavior, using the Efron partial-likelihood method and stepwise variable selection to examine how long it took rice farmers to pay an agricultural insurance premium. They found that education level, off-farm employment, and production costs affected how quickly farmers acted.[@soobramoney2023] treated website user drop-off as a survival problem, in which “survival” meant viewing at least three pages. Both Cox PH and a survival random forest model were used, and browser type, landing page, and search-referral status were found to be key hazards. This shows that the framework is not limited to health and social science, and it can be applied to behavioral and business data as well. Together, these studies show that all the model needs is a duration variable and a binary event or censoring indicator. Also, the Cox model can flexiby handle multiple covariates. Therefore, it is a tool that could be useful wherever the timing of an outcome is of interest. For these reasons, Cox PH was chosen for the recidivism data in this study, which has this same time-to-event structure.
+
+Empirical studies have shown that the Cox PH model can be used well
+beyond its origin in clinical survival analysis. The studies reviewed
+for this project applied the model to academic performance, childbirth,
+agricultural economics, website use, and credit risk. Thus, the model
+could be used in any setting that has time-to-event data with censoring.
+In a study on medical student attrition, a step-wise Cox model was used
+to examine which academic and demographic factors predicted when a
+student would experience academic difficulty. Researchers found that
+curriculum track, MCAT verbal reasoning scores, and early course
+failures were the strongest predictors, and that the risk peaked at a
+specific point in the training timeline [@chau-kuang2010]. In a study on
+the duration of childbirth, Cox PH was used to examine whether a
+specific birth-preparation method changed the time it took to deliver.
+The study found that this method significantly shortened the time to
+delivery compared to standard practice [@wuryandari2018]. [@hidayat2022]
+applied Cox PH to model economic behavior, using the Efron
+partial-likelihood method and step-wise variable selection to examine
+how long it took rice farmers to pay an agricultural insurance premium.
+They found that education level, off-farm employment, and production
+costs affected how quickly farmers acted.[@soobramoney2023] treated
+website user drop-off as a survival problem, in which “survival” meant
+viewing at least three pages. Both Cox PH and a survival random forest
+model were used, and browser type, landing page, and search-referral
+status were found to be key hazards. This shows that the framework is
+not limited to health and social science, and it can be applied to
+behavioral and business data as well. Together, these studies show that
+all the model needs is a duration variable and a binary event or
+censoring indicator. Also, the Cox model can handle multiple covariates.
+Therefore, it is a tool that could be useful wherever the timing of an
+outcome is of interest. For these reasons, Cox PH was chosen for the
+recidivism data in this study, which has this same time-to-event
+structure.
 
 #### Proportional hazards assumption
-Another theme in the literature is that researchers should test that a covariate's effect on hazard stays constant over time. [@bellera2010] warned that predictors can look strong early in follow-up and then weaken considerably over time. Using Schoenfeld residuals, they showed that hormone receptor status in breast cancer patients had this kind of time-varying effect. A standard Cox model would have hidden this finding. [@abadi2014] reached a similar conclusion in a separate and larger breast cancer survival study. They found that the proportional hazards assumption held differently across age and cancer-stage subgroups and fitting stratified Cox models to account for this difference between the groups. Also, [@lee2023] made the same point in a more general methodological review. This review noted that hazard or survival curves that overlap on a graph are a practical sign that the PH assumption has been violated. Failing to detect a violation could lead to misleading conclusions about the true relationship between a covariate and the outcome. For recidivism data, a covariate's effect on the hazard of reincarceration could be concentrated in the early months, therefore the proportional hazards assumption will be tested.
+
+Another theme in the literature is that researchers should test that a
+covariate's effect on hazard stays constant over time. [@bellera2010]
+warned that predictors can look strong early in follow-up and then
+weaken considerably over time. Using Schoenfeld residuals, they showed
+that hormone receptor status in breast cancer patients had this kind of
+time-varying effect. A standard Cox model would have hidden this
+finding. [@abadi2014] reached a similar conclusion in a separate and
+larger breast cancer survival study. They found that the proportional
+hazards assumption held differently across age and cancer-stage
+subgroups and fitting stratified Cox models to account for this
+difference between the groups. Also, [@lee2023] made the same point in a
+more general methodological review. This review noted that hazard or
+survival curves that overlap on a graph are a practical sign that the PH
+assumption has been violated. Failing to detect a violation could lead
+to misleading conclusions about the true relationship between a
+covariate and the outcome. For recidivism data, a covariate's effect on
+the hazard of reincarceration could be concentrated in the early months,
+therefore the proportional hazards assumption will be tested.
 
 #### Handling non-proportional hazards
-Several reviewed studies compared modified Cox specifications designed to address PH violations. [@iketle2024] compared the stratified Cox model, which allows a different baseline hazard for each level of a violating covariate, against the extended Cox model, which puts time-varying covariates directly into the hazard function. This was done using Monte Carlo simulations across different censoring rates, sample sizes, and survival distributions. They found that the extended model performed better than the stratified model when a true time-varying effect was present. However, they noted that there were practical limitations in specifying the correct functional form for that time dependence. [@msk2024] emphasized that the Cox model's main value was that it could isolate each covariate's independent contribution to hazard while controlling for the others. However, they cautioned that the PH assumption itself, along with the interpretation of complex covariate interactions, remained a limitations of this approach. [@dirick2017] took this comparative approach even further in a credit-risk context. They benchmarked Cox PH against accelerated failure time models, spline-based Cox extensions, and mixture cure models (designed to account for a subpopulation that will never experience the event at all) across ten datasets. This study found that Cox PH with penalized splines consistently outperformed fully parametric alternatives, reinforcing the model's flexibility even when covariate-hazard relationships are nonlinear.
 
-Overall, the Cox PH is well suited to the structure of the Iowa data. This study will begin with a standard Cox PH model, tests the proportional hazards assumption formally using Schoenfeld residuals, and addresses any violations dectected through stratification or time-varying covariate specifications.
+Several reviewed studies compared modified Cox specifications designed
+to address PH violations. [@iketle2024] compared the stratified Cox
+model, which allows a different baseline hazard for each level of a
+violating covariate, against the extended Cox model, which puts
+time-varying covariates directly into the hazard function. This was done
+using Monte Carlo simulations across different censoring rates, sample
+sizes, and survival distributions. They found that the extended model
+performed better than the stratified model when a true time-varying
+effect was present. However, they noted that there were practical
+limitations in specifying the correct functional form for that time
+dependence. [@msk2024] emphasized that the Cox model's main value was
+that it could isolate each covariate's independent contribution to
+hazard while controlling for the others. However, they cautioned that
+the PH assumption itself, along with the interpretation of complex
+covariate interactions, remained a limitations of this approach.
+[@dirick2017] took this comparative approach even further in a
+credit-risk context. They benchmarked Cox PH against accelerated failure
+time models, spline-based Cox extensions, and mixture cure models
+(designed to account for a subpopulation that will never experience the
+event at all) across ten datasets. This study found that Cox PH with
+penalized splines consistently outperformed fully parametric
+alternatives, reinforcing the model's flexibility even when
+covariate-hazard relationships are nonlinear.
+
+Overall, the Cox PH is well suited to the structure of the Iowa data.
+This study will begin with a standard Cox PH model, tests the
+proportional hazards assumption formally using Schoenfeld residuals, and
+addresses any violations detected through stratification or time-varying
+covariate specifications.
 
 ## Methods
 
 ### Cox Proportional Hazards Model
 
-Survival analysis examines both whether an event occurs and the amount of time before it occurs, while accounting for censored observations. An observation is right-censored when the event has not been observed by the end of the available follow-up. The Cox proportional hazards model evaluates associations between explanatory variables and the hazard of an event. In this analysis, the event of interest was reincarceration.
+Survival analysis examines both whether an event occurs and the amount
+of time before it occurs, while accounting for censored observations. An
+observation is right-censored when the event has not been observed by
+the end of the available follow-up. The Cox proportional hazards model
+evaluates associations between explanatory variables and the hazard of
+an event. In this analysis, the event of interest was reincarceration.
 
-The Cox model expresses an individual’s hazard at time \(t\) as
+The Cox model expresses an individual’s hazard at time (t) as
 
 $$
 \lambda(t \mid X) = \lambda_0(t)\exp(\beta_1X_1+\beta_2X_2+\cdots+\beta_pX_p),
 $$
 
-where \(\lambda_0(t)\) is the baseline hazard, \(\beta_j\) represents a regression coefficient, and \(X_j\) represents an explanatory variable. The baseline hazard is left unspecified, allowing the model to estimate predictor associations without assuming a particular survival-time distribution [@bellera2010].
+where (\lambda\_0(t)) is the baseline hazard, (\beta\_j) represents a
+regression coefficient, and (X_j) represents an explanatory variable.
+The baseline hazard is left unspecified, allowing the model to estimate
+predictor associations without assuming a particular survival-time
+distribution [@bellera2010].
 
 Exponentiating a coefficient produces a hazard ratio:
 
@@ -67,41 +202,138 @@ $$
 \text{HR}_j=\exp(\beta_j).
 $$
 
-For a continuous predictor, this represents the relative hazard associated with a one-unit increase, holding other predictors constant. For a categorical predictor, it compares a category with its reference category. A hazard ratio greater than one indicates a higher hazard of reincarceration, while a value below one indicates a lower hazard. A value of one indicates no difference in hazard. Hazard ratios describe relative instantaneous event rates among individuals who have not yet experienced the event, rather than differences in the probability of reincarceration.
+For a continuous predictor, this represents the relative hazard
+associated with a one-unit increase, holding other predictors constant.
+For a categorical predictor, it compares a category with its reference
+category. A hazard ratio greater than one indicates a higher hazard of
+reincarceration, while a value below one indicates a lower hazard. A
+value of one indicates no difference in hazard. Hazard ratios describe
+relative instantaneous event rates among individuals who have not yet
+experienced the event, rather than differences in the probability of
+reincarceration.
 
 ### Initial Graphical Analysis and Group Comparisons
 
-Kaplan–Meier curves were used to describe the probability of remaining free from reincarceration over time across risk classifications, offense types, sex, and release types. This method incorporates right-censored observations without requiring proportional hazards. Curves were examined to identify differences in survival patterns and provide an initial visual assessment of potential non-proportionality.
+Kaplan–Meier curves were used to describe the probability of remaining
+free from reincarceration over time across risk classifications, offense
+types, sex, and release types. This method incorporates right-censored
+observations without requiring proportional hazards. Curves were
+examined to identify differences in survival patterns and provide an
+initial visual assessment of potential non-proportionality.
 
-Crossing curves or changes in their relative patterns over time may suggest that group associations vary over time. However, the absence of crossing does not establish that the proportional hazards assumption holds. Visual interpretation can also become more difficult when several categories are displayed together. Kaplan–Meier plots were therefore treated as an exploratory assessment rather than a definitive test of proportional hazards [@bellera2010].
+Crossing curves or changes in their relative patterns over time may
+suggest that group associations vary over time. However, the absence of
+crossing does not establish that the proportional hazards assumption
+holds. Visual interpretation can also become more difficult when several
+categories are displayed together. Kaplan–Meier plots were therefore
+treated as an exploratory assessment rather than a definitive test of
+proportional hazards [@bellera2010].
 
-Log-rank tests were used to compare survival distributions across offense types, sex, and release types. These tests compare observed and expected event counts across time to evaluate the null hypothesis that the groups have the same survival distribution. They assess unadjusted group differences and do not account for other predictors.
+Log-rank tests were used to compare survival distributions across
+offense types, sex, and release types. These tests compare observed and
+expected event counts across time to evaluate the null hypothesis that
+the groups have the same survival distribution. They assess unadjusted
+group differences and do not account for other predictors.
 
 ### Assessing Proportional Hazards
 
-The Cox model assumes that hazard ratios remain constant over time. Although the baseline hazard may change over time, the relative hazard associated with a predictor is assumed to remain the same. Graphical assessment can identify possible departures from this assumption, but additional model diagnostics are needed to evaluate whether predictor effects vary over time.
+The Cox model assumes that hazard ratios remain constant over time.
+Although the baseline hazard may change over time, the relative hazard
+associated with a predictor is assumed to remain the same. Graphical
+assessment can identify possible departures from this assumption, but
+additional model diagnostics are needed to evaluate whether predictor
+effects vary over time.
 
-One approach is to extend the Cox model by adding an interaction between a predictor and a function of time. This allows the predictor’s effect to change during follow-up. The time function may be time itself, time squared, or the logarithm of time. Testing whether the interaction coefficient differs significantly from zero provides a formal assessment of non-proportionality. A significant interaction provides evidence that the predictor’s effect changes over time. The fitted model can then estimate hazard ratios at specific time points to describe this changing association. However, the approach depends on selecting an appropriate time function; an unfit function may fail to capture the pattern of change [@bellera2010].
+One approach is to extend the Cox model by adding an interaction between
+a predictor and a function of time. This allows the predictor’s effect
+to change during follow-up. The time function may be time itself, time
+squared, or the logarithm of time. Testing whether the interaction
+coefficient differs significantly from zero provides a formal assessment
+of non-proportionality. A significant interaction provides evidence that
+the predictor’s effect changes over time. The fitted model can then
+estimate hazard ratios at specific time points to describe this changing
+association. However, the approach depends on selecting an appropriate
+time function; an unfit function may fail to capture the pattern of
+change [@bellera2010].
 
-Another approach uses Schoenfeld residual tests and plots to assess whether estimated predictor effects change systematically over time. A roughly horizontal pattern supports a constant effect, while an organized trend may indicate non-proportionality. Statistical tests and graphical patterns should be considered together when evaluating the assumption [@bellera2010].
+Another approach uses Schoenfeld residual tests and plots to assess
+whether estimated predictor effects change systematically over time. A
+roughly horizontal pattern supports a constant effect, while an
+organized trend may indicate non-proportionality. Statistical tests and
+graphical patterns should be considered together when evaluating the
+assumption [@bellera2010].
 
 ### Addressing Non-Proportionality
 
-When the proportional hazards assumption is violated, the appropriate modification depends on the predictor and the research question. A stratified Cox model allows separate baseline hazards across categories of a stratification variable while estimating common effects for the remaining predictors. This approach accommodates differences in baseline hazard patterns but does not estimate a hazard ratio for the stratification variable.
+When the proportional hazards assumption is violated, the appropriate
+modification depends on the predictor and the research question. A
+stratified Cox model allows separate baseline hazards across categories
+of a stratification variable while estimating common effects for the
+remaining predictors. This approach accommodates differences in baseline
+hazard patterns but does not estimate a hazard ratio for the
+stratification variable.
 
-Alternatively, predictor-by-time interactions allow associations to be estimated as changing effects over time. These approaches provide ways to account for non-proportional hazards while retaining the Cox modeling framework. The specific model fitted, diagnostic findings, and any resulting modifications are presented in the Modeling and Results section.
-
+Alternatively, predictor-by-time interactions allow associations to be
+estimated as changing effects over time. These approaches provide ways
+to account for non-proportional hazards while retaining the Cox modeling
+framework. The specific model fitted, diagnostic findings, and any
+resulting modifications are presented in the Modeling and Results
+section.
 
 ## Analysis and Results
 
 ### Data Exploration and Visualization
-The Iowa Prison Recidivism Status dataset contains 31,703 case-level records of individuals released from Iowa prisons through parole, work release, or discharge, beginning with the FY2016 cohort. It covers releases from July 2015 through June 2022 and tracks whether each individual was reincarcerated. Available variables include age, sex, race, the original offense, the convicting offense on recidivism if one occurred, and a risk classification.
 
-This analysis looks at reincarceration outcomes for 31,700 individuals who were followed for up to three years after release, three cases removed due to sex and race being unknown. The overall reincarceration rate was 36.9%, but this rate varied across demographic and offense-based subgroups. Violent offenders had the lowest rate at 29.2%, while individuals convicted of "other" offenses had the highest at 50.3%. This goes against a common assumption that more severe offenses lead to worse reentry outcomes. The timing of reincarceration also showed a clear pattern. Among release records with observed reincarceration, the average time to reincarceration is 449 days, and the rate of return leveled off after that point.
+The Iowa Prison Recidivism Status dataset contains 31,703 case-level
+records of individuals released from Iowa prisons through parole, work
+release, or discharge, beginning with the FY2016 cohort. It covers
+releases from July 2015 through June 2022 and tracks whether each
+individual was reincarcerated.The dataset includes age, sex, race, the
+original offense, and risk classification. For individuals who returned
+to prison, it also includes the number of days from release to
+reincarceration and, when applicable, the offense associated with the
+return.
 
-Differences appeared across several other groups as well. Males were reincarcerated at a rate about 8 percentage points higher than females (38.0% vs. 30.0%). American Indian or Alaska Native individuals had the highest rate of any racial group at 44.7%. Risk classification separated outcomes as intended, with high risk individuals reincarcerated at a rate of 42.0% compared to 31.4% for low risk individuals. However, individuals who were never formally assessed had a lower rate than the low risk group. This might indicate some bias as the reason for the missing risk is unknown.
+Time at risk began on the date of release from prison. For records with
+a return to prison, the event time was the reported number of days from
+release to reincarceration. Six same-day returns were recorded as 0 days
+and assigned an event time of 0.5 days for the analysis. For records
+with no reported return, follow-up was right-censored at 1,095 days, a
+fixed-day approximation of Iowa’s three-year reporting window. Both
+`days_to_recid` and `survival_time_months` were blank for these records,
+so shorter follow-up could not be verified.
 
-The eight release supervision types in the data also produced different outcomes. Individuals discharged at the expiration of their sentence had survival probabilities staying above 70% across the full three year period. Those paroled with immediate discharge and those released to special sentences had survival probabilities falling below 60% within the first year. Individuals granted parole, who made up the largest group at 20,551, fell in between. These differences suggest that release type may be more than a marker of underlying offender characteristics, and that supervision conditions themselves could shape reentry outcomes.
+This analysis looks at reincarceration outcomes for 31,700 individuals
+who were followed for up to three years after release, three cases
+removed due to sex and race being unknown. The overall reincarceration
+rate was 36.9%, but this rate varied across demographic and
+offense-based subgroups. Violent offenders had the lowest rate at 29.2%,
+while individuals convicted of "other" offenses had the highest at
+50.3%. This goes against a common assumption that more severe offenses
+lead to worse reentry outcomes. The timing of reincarceration also
+showed a clear pattern. Among release records with observed
+reincarceration, the average time to reincarceration is 449 days, and
+the rate of return leveled off after that point.
+
+Differences appeared across several other groups as well. Males were
+reincarcerated at a rate about 8 percentage points higher than females
+(38.0% vs. 30.0%). American Indian or Alaska Native individuals had the
+highest rate of any racial group at 44.7%. Risk classification separated
+outcomes as intended, with high risk individuals reincarcerated at a
+rate of 42.0% compared to 31.4% for low risk individuals. However,
+individuals who were never formally assessed had a lower rate than the
+low risk group. This might indicate some bias as the reason for the
+missing risk is unknown.
+
+The eight release supervision types in the data also produced different
+outcomes. Individuals discharged at the expiration of their sentence had
+survival probabilities staying above 70% across the full three year
+period. Those paroled with immediate discharge and those released to
+special sentences had survival probabilities falling below 60% within
+the first year. Individuals granted parole, who made up the largest
+group at 20,551, fell in between. These differences suggest that release
+type may be more than a marker of underlying offender characteristics,
+and that supervision conditions themselves could shape reentry outcomes.
 
 ```{r, warning=FALSE, echo=T, message=FALSE}
 # loading packages 
@@ -127,7 +359,8 @@ df <- data %>%
   mutate(
     event = as.integer(is_recid),
     release_date = as.Date(exit_sup_end_date),
-    time_days = if_else(event == 1L, days_to_recid, 1095),                             # Assign observed event times; censor non-events at 1095 days
+    # Assign observed event times; censor non-events at 1095 days
+    time_days = if_else(event == 1L, days_to_recid, 1095)                             
   )
 
 df <- df %>% mutate(time_days = if_else(time_days == 0, 0.5, time_days))
@@ -189,7 +422,11 @@ df %>%
        x = "Months to reincarceration", y = "Count") +
   theme_minimal()
 ```
-Among the 11,699 people who were reincarcerated, returns were rare in the first month, rose quickly to a peak around months 6 to 7 (about 570 per month), and then declined, flattening at roughly 150 per month in the final six months of follow-up.
+
+Among the 11,699 people who were reincarcerated, returns were rare in
+the first month, rose quickly to a peak around months 6 to 7 (about 570
+per month), and then declined, flattening at roughly 150 per month in
+the final six months of follow-up.
 
 ```{r - time plot}
 set.seed(20)  
@@ -222,8 +459,11 @@ legend("bottomright",
        pch = c(19, 62),
        col = c("#d1495b", "#3a86d4"))
 ```
-Of the 20 randomly sampled people, six were reincarcerated, at about 335, 335, 415, 480, 497, and 760 days. The other 14 were censored at 1,095 days, we know thoes individuals not reincarcerated within three years.
 
+Of the 20 randomly sampled people, six were reincarcerated, at about
+335, 335, 415, 480, 497, and 760 days. The other 14 were censored at
+1,095 days, we know thoes individuals not reincarcerated within three
+years.
 
 ```{r - Kaplan–Meier model 1}
 km_risk <- survfit(Surv(time_days, event) ~ risk_ranking, data = df)
@@ -273,8 +513,7 @@ legend("bottomleft", bty = "n", lwd = 2,
 survdiff(Surv(time_days, event) ~ sex, data = df)
 ```
 
-
-```{r - Kaplan–Meier model 4} 
+```{r - Kaplan–Meier model 4}
 km_exit_reason <- survfit(Surv(time_days, event) ~ exit_sup_reason, data = df)
 
 colors <- brewer.pal(8, "Dark2")
@@ -383,29 +622,70 @@ ph_stratified
 plot(ph_stratified)
 
 ```
+
 ### Modeling and Results
-The dataset contained 31,703 release records. Three records with missing sex were removed, leaving 31,700 (11,699 reincarcerations). Time to event was days from release to reincarceration; individuals with no return were right-censored at 1,095 days (three years). Six people reincarcerated on the day of release had their time set to 0.5 days so they remained in the risk set. Age was centered at the sample mean ([mean] years), so its hazard ratio reflects a one-year difference from the average. Missing risk classification (n = 1,566) was retained as a “Not Assessed” category. Reference levels were female, Low risk, Drug offense, and discharge at expiration of sentence.
+
+The dataset contained 31,703 release records. Three records with missing
+sex were removed, leaving 31,700 (11,699 reincarcerations). Time to
+event was days from release to reincarceration; individuals with no
+return were right-censored at 1,095 days (three years). Six people
+reincarcerated on the day of release had their time set to 0.5 days so
+they remained in the risk set. Age was centered at the sample mean
+(\[mean\] years), so its hazard ratio reflects a one-year difference
+from the average. Missing risk classification (n = 1,566) was retained
+as a “Not Assessed” category. Reference levels were female, Low risk,
+Drug offense, and discharge at expiration of sentence.
 
 ### Initial Cox model
-The first model included age, sex, risk classification, offense type, and release type. All covariates were significant (likelihood ratio test χ² = 2,777, df = 16, p < 0.001), and the concordance was 0.638. The model correctly ranks which of two individuals returns first about 64% of the time.
 
-Release type had the largest hazard ratios. Compared with individuals discharged at the end of their sentence, the hazard of reincarceration was 1.89 times higher for those granted parole (95% CI 1.80–1.99), 2.60 times higher for those paroled to an Iowa detainer (2.19–3.08), and 2.83 times higher for those released to a special sentence (2.57–3.12). The hazard was lower for those paroled with immediate discharge (HR = 0.72, 0.62–0.83). Individuals paroled to INS (HR = 0.11) or U.S. Marshal (HR = 0.15) detainers had very low hazards, consistent with their removal from Iowa custody. Parole to an out-of-state detainer did not differ from the reference group (HR = 1.02, p = 0.87).
+The first model included age, sex, risk classification, offense type,
+and release type. All covariates were significant (likelihood ratio test
+χ² = 2,777, df = 16, p \< 0.001), and the concordance was 0.638. The
+model correctly ranks which of two individuals returns first about 64%
+of the time.
+
+Release type had the largest hazard ratios. Compared with individuals
+discharged at the end of their sentence, the hazard of reincarceration
+was 1.89 times higher for those granted parole (95% CI 1.80–1.99), 2.60
+times higher for those paroled to an Iowa detainer (2.19–3.08), and 2.83
+times higher for those released to a special sentence (2.57–3.12). The
+hazard was lower for those paroled with immediate discharge (HR = 0.72,
+0.62–0.83). Individuals paroled to INS (HR = 0.11) or U.S. Marshal (HR =
+0.15) detainers had very low hazards, consistent with their removal from
+Iowa custody. Parole to an out-of-state detainer did not differ from the
+reference group (HR = 1.02, p = 0.87).
 
 ### Checking the proportional hazards assumption
-Schoenfeld residual tests showed that the model as a whole violated the proportional hazards assumption (global χ² = 437.7, df = 16, p < 0.001). Release type was responsible for most of the violation (χ² = 370.7, df = 7), accounting for about 85% of the global test statistic. Smaller violations were found for risk classification (χ² = 31.0), offense type (χ² = 22.8), and sex (χ² = 7.9). Age did not show a violation (p = 0.11), and its residual plot is flat across follow-up.
 
-This finding is consistent with the Kaplan–Meier curves. The different release types do not just shift the risk of return up or down; they change its shape over time. Groups such as special sentence and Iowa detainer have most of their returns in the first several months, while groups released without supervision return at a slower, steadier pace. A single hazard ratio for release type would therefore average over very different patterns and could be misleading.
+Schoenfeld residual tests showed that the model as a whole violated the
+proportional hazards assumption (global χ² = 437.7, df = 16, p \<
+0.001). Release type was responsible for most of the violation (χ² =
+370.7, df = 7), accounting for about 85% of the global test statistic.
+Smaller violations were found for risk classification (χ² = 31.0),
+offense type (χ² = 22.8), and sex (χ² = 7.9). Age did not show a
+violation (p = 0.11), and its residual plot is flat across follow-up.
 
-### Stratified model 
-Because release type was the main source of non-proportionality, and because it is not a variable whose effect needs to be summarized as a single number, the model was refit stratified by release type. Stratification allows each release type to have its own baseline hazard, so its changing pattern over time no longer has to be forced into a single hazard ratio, while a common effect is still estimated for each of the remaining covariates. 
+This finding is consistent with the Kaplan–Meier curves. The different
+release types do not just shift the risk of return up or down; they
+change its shape over time. Groups such as special sentence and Iowa
+detainer have most of their returns in the first several months, while
+groups released without supervision return at a slower, steadier pace. A
+single hazard ratio for release type would therefore average over very
+different patterns and could be misleading.
 
+### Stratified model
 
+Because release type was the main source of non-proportionality, and
+because it is not a variable whose effect needs to be summarized as a
+single number, the model was refit stratified by release type.
+Stratification allows each release type to have its own baseline hazard,
+so its changing pattern over time no longer has to be forced into a
+single hazard ratio, while a common effect is still estimated for each
+of the remaining covariates.
 
 ### Findings
 
-
-
--   **Tell a story about what the data reveals.**
+- **Tell a story about what the data reveals.**
 
 ```{r}
 
@@ -413,8 +693,8 @@ Because release type was the main source of non-proportionality, and because it 
 
 ### Conclusion
 
--   Summarize your key findings.
+- Summarize your key findings.
 
--   Discuss the implications of your results.
+- Discuss the implications of your results.
 
 ## References
