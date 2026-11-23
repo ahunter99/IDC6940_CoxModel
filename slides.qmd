@@ -1,19 +1,30 @@
 ---
-title: "Present a great story for data science projects"
-subtitle: "This is a Slide Template"
-author: "Students names (Advisor: Dr. Cohen)"
-date: '`r Sys.Date()`'
+title: "Time to Reincarceration in Iowa"
+subtitle: "A Cox Proportional Hazards Analysis"
+author: "Aliyah Hunter & Sophia Bamman Craig"
+date: today
+
 format:
-  revealjs
-course: Capstone Projects in Data Science
-bibliography: references.bib # file contains bibtex for references
-#always_allow_html: true # this allows to get PDF with HTML features
-self-contained: true
-execute: 
+  revealjs:
+    theme: simple
+    slide-number: true
+    transition: fade
+    incremental: false
+    code-fold: true
+    smaller: false
+    width: 1280
+    height: 720
+
+course: "Capstone Projects in Data Science"
+bibliography: references.bib
+
+execute:
+  echo: false
   warning: false
   message: false
-editor: 
-  markdown: 
+
+editor:
+  markdown:
     wrap: 72
 ---
 
@@ -39,7 +50,21 @@ More information about `revealjs`:
 
 -   Introduce why it is relevant needs.
 
+**Story**
+When someone is released from incarceration, what factors influence whether they return, and how soon?
+
+Two individuals might both return to incarceration within three years. But what if one returns after 30 days, 
+while the other returns after two years?
+
+If we only look at whether reincarceration occurred, we miss an important part of the story: time.
+
+That's what our project aims to investigate. Using survival analysis, we examined how demographic characteristics, 
+risk classifications, and release-related factors are associated with the time until reincarceration.
+
 -   Provide an overview of your approach.
+
+## Overview {.smaller}
+- 
 
 In kernel estimator, weight function is known as kernel function
 [@efr2008]. Cite this paper [@bro2014principal]. The GEE [@wang2014].
