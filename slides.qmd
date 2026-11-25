@@ -40,31 +40,34 @@ More information about `revealjs`:
 <https://quarto.org/docs/reference/formats/presentations/revealjs.html>
 :::
 
-## Introduction  {.smaller}
+## Introduction {.smaller}
 
--   Develop a storyline that captures attention and maintains interest.
+- Develop a storyline that captures attention and maintains interest.
 
--   Your audience is your peers
+- Your audience is your peers
 
--   Clearly state the problem or question you're addressing.
+- Clearly state the problem or question you're addressing.
 
--   Introduce why it is relevant needs.
+- Introduce why it is relevant needs.
 
-**Story**
-When someone is released from incarceration, what factors influence whether they return, and how soon?
+**Story** When someone is released from incarceration, what factors
+influence whether they return, and how soon?
 
-Two individuals might both return to incarceration within three years. But what if one returns after 30 days, 
-while the other returns after two years?
+Two individuals might both return to incarceration within three years.
+But what if one returns after 30 days, while the other returns after two
+years?
 
-If we only look at whether reincarceration occurred, we miss an important part of the story: time.
+If we only look at whether reincarceration occurred, we miss an
+important part of the story: time.
 
-That's what our project aims to investigate. Using survival analysis, we examined how demographic characteristics, 
-risk classifications, and release-related factors are associated with the time until reincarceration.
+That's what our project aims to investigate. Using survival analysis, we
+examined how demographic characteristics, risk classifications, and
+release-related factors are associated with the time until
+reincarceration.
 
--   Provide an overview of your approach.
+- Provide an overview of your approach.
 
-## Overview {.smaller}
-- 
+## \## Overview {.smaller}
 
 In kernel estimator, weight function is known as kernel function
 [@efr2008]. Cite this paper [@bro2014principal]. The GEE [@wang2014].
@@ -72,19 +75,17 @@ The PCA [@daffertshofer2004pca]\*
 
 ## Methods
 
--   Detail the models or algorithms used.
+- Detail the models or algorithms used.
 
--   Justify your choices based on the problem and data.
-
-
+- Justify your choices based on the problem and data.
 
 ## Data Exploration and Visualization
 
--   Describe your data sources and collection process.
+- Describe your data sources and collection process.
 
--   Present initial findings and insights through visualizations.
+- Present initial findings and insights through visualizations.
 
--   Highlight unexpected patterns or anomalies.
+- Highlight unexpected patterns or anomalies.
 
 ## Data Exploration and Visualization {.smaller}
 
@@ -121,13 +122,13 @@ ggplot1 = murders %>% ggplot(mapping = aes(x=population/10^6, y=total))
 
 ## Modeling and Results
 
--   Explain your data preprocessing and cleaning steps.
+- Explain your data preprocessing and cleaning steps.
 
--   Present your key findings in a clear and concise manner.
+- Present your key findings in a clear and concise manner.
 
--   Use visuals to support your claims.
+- Use visuals to support your claims.
 
--   **Tell a story about what the data reveals.**
+- **Tell a story about what the data reveals.**
 
 ```{r}
 
@@ -135,8 +136,8 @@ ggplot1 = murders %>% ggplot(mapping = aes(x=population/10^6, y=total))
 
 ## Conclusion
 
--   Summarize your key findings.
+- Summarize your key findings.
 
--   Discuss the implications of your results.
+- Discuss the implications of your results.
 
 ## References
