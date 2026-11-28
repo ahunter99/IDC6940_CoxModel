@@ -1,8 +1,7 @@
 ---
 title: "Time to Reincarceration in Iowa"
 subtitle: "A Cox Proportional Hazards Analysis"
-author: "Aliyah Hunter & Sophia Bamman Craig"
-date: today
+author: "Sophia Bamman Craig & Aliyah Hunter"
 
 format:
   revealjs:
@@ -28,116 +27,514 @@ editor:
     wrap: 72
 ---
 
-::: callout-important
-**Remember:** Your goal is to make your audience understand and care
-about your findings. By crafting a compelling story, you can effectively
-communicate the value of your data science project.
+```{r setup}
+library(tidyverse)
+library(survival)
+library(survminer)
+library(gt)
+library(knitr)
 
-Carefully read this template since it has instructions and tips to
-writing!
+# --- Load and clean (same pipeline as the paper) ---------------------
+data_raw <- read_csv("ipr_dataset.csv", na = c("", "NA"))
 
-More information about `revealjs`:
-<https://quarto.org/docs/reference/formats/presentations/revealjs.html>
+empty_cols <- names(data_raw)[colSums(is.na(data_raw)) == nrow(data_raw)]
+data <- data_raw %>% select(-all_of(empty_cols))
+
+df <- data %>%
+  mutate(
+    event        = as.integer(is_recid),
+    release_date = as.Date(exit_sup_end_date),
+    time_days    = if_else(event == 1L, days_to_recid, 1095)
+  ) %>%
+  mutate(time_days = if_else(time_days == 0, 0.5, time_days)) %>%
+  unite("exit_combined", exit_type, exit_subtype, sep = " - ", remove = FALSE) %>%
+  filter(!is.na(sex)) %>%
+  mutate(
+    sex             = factor(sex),
+    Race            = factor(Race),
+    exit_type       = factor(exit_type),
+    exit_sup_reason = factor(exit_sup_reason),
+    risk_ranking    = factor(
+      if_else(is.na(risk_ranking), "Not Assessed", risk_ranking),
+      levels = c("Low", "Moderate", "High", "Not Assessed")
+    ),
+    age_c = age - mean(age, na.rm = TRUE)
+  )
+
+# --- Models ----------------------------------------------------------
+cox_model <- coxph(
+  Surv(time_days, event) ~ age_c + sex + risk_ranking + exit_type + exit_sup_reason,
+  data = df
+)
+
+cox_strat <- coxph(
+  Surv(time_days, event) ~ age_c + sex + risk_ranking + exit_type +
+    strata(exit_sup_reason),
+  data = df
+)
+
+zph_init  <- cox.zph(cox_model)
+zph_strat <- cox.zph(cox_strat)
+```
+
+
+## The Question {.smaller}
+
+- Roughly **one in three** people released from Iowa prisons returns within three years.
+
+- Two people can both return within that window — one after **30 days**, the other after **two years**.
+
+- A yes/no measure counts those identically.
+
+
+**If we only ask *whether* reincarceration happened, we miss when it happened — and when is what reentry programming has to plan around.**
+. . .
+
+---
+
+## Why Timing Matters
+
+::: {.columns}
+::: {.column width="50%"}
+**A binary outcome tells you:**
+
+- How many returned
+- Who returned
+
+Analyzed with logistic regression
 :::
 
-## Introduction {.smaller}
+::: {.column width="50%"}
+**A time-to-event outcome tells you:**
 
-- Develop a storyline that captures attention and maintains interest.
+- How many returned
+- Who returned
+- **When** they returned
+- What happens to people still at risk
 
-- Your audience is your peers
+Analyzed with survival analysis
+:::
+:::
 
-- Clearly state the problem or question you're addressing.
+::: {.callout-note appearance="simple"}
+Our question: which demographic, risk, offense, and release characteristics are associated with the **hazard** of reincarceration — and do those associations hold steady over three years?
+:::
 
-- Introduce why it is relevant needs.
+. . .
 
-**Story** When someone is released from incarceration, what factors
-influence whether they return, and how soon?
+---
 
-Two individuals might both return to incarceration within three years.
-But what if one returns after 30 days, while the other returns after two
-years?
+## The Data {.smaller}
 
-If we only look at whether reincarceration occurred, we miss an
-important part of the story: time.
+**Iowa Prison Recidivism Status** — Iowa Department of Corrections, via data.iowa.gov
 
-That's what our project aims to investigate. Using survival analysis, we
-examined how demographic characteristics, risk classifications, and
-release-related factors are associated with the time until
-reincarceration.
+::: {.columns}
+::: {.column width="55%"}
+- **31,703** case-level release records
+- Release cohorts **FY2016 – FY2022**
+- Parole, work release, or discharge
+- Uniform **three-year** tracking window
+:::
 
-- Provide an overview of your approach.
+::: {.column width="45%"}
+**Variables used**
 
-## \## Overview {.smaller}
+- Age at release
+- Sex, race
+- Risk classification
+- Offense type
+- Release supervision reason
+- Days to reincarceration
+:::
+:::
 
-In kernel estimator, weight function is known as kernel function
-[@efr2008]. Cite this paper [@bro2014principal]. The GEE [@wang2014].
-The PCA [@daffertshofer2004pca]\*
+**Analysis sample:** 31,700 records (3 removed for missing sex) · **11,699 events (36.9%)**
 
-## Methods
+. . .
 
-- Detail the models or algorithms used.
 
-- Justify your choices based on the problem and data.
+---
 
-## Data Exploration and Visualization
+## Defining Time and Censoring {.smaller}
 
-- Describe your data sources and collection process.
+::: {.columns}
+::: {.column width="45%"}
+- Clock starts at **release**
+- Event = return to prison
+- No return by the end of follow-up → **right-censored at 1,095 days**
+- 6 same-day returns set to 0.5 days so they stay in the risk set
+:::
 
-- Present initial findings and insights through visualizations.
+::: {.column width="55%"}
+```{r swimmer, fig.height=4.2}
+set.seed(42)
+pt <- df %>%
+  slice_sample(n = 20) %>%
+  arrange(time_days) %>%
+  mutate(id = row_number())
 
-- Highlight unexpected patterns or anomalies.
+ggplot(pt, aes(y = id)) +
+  geom_segment(aes(x = 0, xend = time_days, yend = id),
+               colour = "#3a86d4", linewidth = 1.4) +
+  geom_point(aes(x = time_days,
+                 shape = factor(event), colour = factor(event)),
+             size = 3) +
+  geom_vline(xintercept = 1095, linetype = "dashed", colour = "grey50") +
+  scale_shape_manual(values = c("0" = 62, "1" = 19),
+                     labels = c("Censored", "Reincarcerated")) +
+  scale_colour_manual(values = c("0" = "#3a86d4", "1" = "#d1495b"),
+                      labels = c("Censored", "Reincarcerated")) +
+  labs(x = "Days since release", y = NULL,
+       shape = NULL, colour = NULL,
+       title = "20 randomly sampled records") +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.y = element_blank(), legend.position = "bottom")
+```
+:::
+:::
 
-## Data Exploration and Visualization {.smaller}
+---
 
-A study was conducted to determine how...
+## When Do Returns Happen? {.smaller}
 
-```{r, warning=FALSE, echo=F, message=FALSE}
-# loading packages 
-library(tidyverse)
-library(knitr)
-library(ggthemes)
-library(ggrepel)
-library(dslabs)
+```{r event-timing, fig.height=3.6, fig.width=9}
+df %>%
+  filter(event == 1) %>%
+  mutate(month = pmin(ceiling(time_days / 30.44), 36)) %>%
+  count(month) %>%
+  ggplot(aes(month, n)) +
+  geom_col(fill = "#d1495b", width = 0.85) +
+  scale_x_continuous(breaks = seq(0, 36, 6)) +
+  labs(x = "Months since release", y = "Reincarcerations",
+       title = "Monthly reincarceration counts among the 11,699 who returned") +
+  theme_minimal(base_size = 13)
 ```
 
-```{r, warning=FALSE, echo=F}
-# Load Data
-#kable(head(murders))
+- Returns are **rare in month one**, then climb sharply
+- Peak around **months 6–7** (~570 per month)
+- Decline to roughly **150 per month** by the end of follow-up
+- Mean time to reincarceration: **449 days**
 
-ggplot1 = murders %>% ggplot(mapping = aes(x=population/10^6, y=total)) 
+---
 
-  ggplot1 + geom_point(aes(col=region), size = 4) +
-  geom_text_repel(aes(label=abb)) +
-  scale_x_log10() +
-  scale_y_log10() +
-  geom_smooth(formula = "y~x", method=lm,se = F)+
-  xlab("Populations in millions (log10 scale)") + 
-  ylab("Total number of murders (log10 scale)") +
-  ggtitle("US Gun Murders in 2010") +
-  scale_color_discrete(name = "Region")+
-      theme_bw()
-  
+## Group Differences {.smaller}
 
+::: {.columns}
+::: {.column width="50%"}
+**Offense type**
+
+| Type | Rate |
+|------|-----:|
+| Other | 50.3% |
+| Drug | 40.7% |
+| Property | 37.4% |
+| Public Order | 31.8% |
+| Violent | 29.2% |
+
+**Sex**
+
+- Male 38.0% · Female 30.0%
+:::
+
+::: {.column width="50%"}
+**Risk classification**
+
+| Level | Rate |
+|-------|-----:|
+| High | 42.0% |
+| Moderate | 35.6% |
+| Low | 31.4% |
+| Not Assessed | 26.6% |
+
+::: {.callout-warning appearance="simple"}
+People never formally assessed returned at a **lower** rate than the Low-risk group. The reason for the missing assessment is unknown.
+:::
+:::
+:::
+
+---
+
+## Release Pathway Matters Most {.smaller}
+
+```{r pathway-rates}
+df %>%
+  group_by(exit_sup_reason) %>%
+  summarise(n = n(), Rate = 100 * mean(event), .groups = "drop") %>%
+  arrange(desc(Rate)) %>%
+  rename(`Release reason` = exit_sup_reason, N = n) %>%
+  gt() %>%
+  fmt_number(columns = Rate, decimals = 1) %>%
+  fmt_number(columns = N, use_seps = TRUE, decimals = 0) %>%
+  cols_label(Rate = "3-yr rate (%)") %>%
+  tab_options(table.font.size = "70%")
 ```
 
-## Modeling and Results
 
-- Explain your data preprocessing and cleaning steps.
+---
 
-- Present your key findings in a clear and concise manner.
+## Kaplan–Meier Curves {.smaller}
 
-- Use visuals to support your claims.
+```{r km-plots, fig.height=4.4, fig.width=10}
+library(patchwork)
 
-- **Tell a story about what the data reveals.**
+pal3 <- c("#257de0", "#00b894", "#ec4647")  # low → high hazard
+pal2 <- c("#257de0", "#ec4647")
 
-```{r}
+km_panel <- function(data, var, labs, title, cols) {
+  fit <- surv_fit(as.formula(paste("Surv(time_days, event) ~", var)),
+                  data = data)
+  ggsurvplot(
+    fit, data = data,
+    conf.int = FALSE, linetype = "strata",
+    legend = "bottom", legend.title = "", legend.labs = labs,
+    palette = cols, title = title,
+    xlab = "Days", ylab = NULL,
+    ggtheme = theme_minimal(base_size = 10)
+  )$plot +
+    theme(plot.title   = element_text(face = "bold", size = 11),
+          legend.text  = element_text(size = 8),
+          legend.margin = margin(t = -4))
+}
 
+# --- Risk: Low vs High (Moderate is intermediate; Not Assessed noted verbally)
+d_risk <- df %>% filter(risk_ranking %in% c("Low", "High")) %>%
+  mutate(risk_ranking = droplevels(risk_ranking))
+
+# --- Offense: best, model reference, worst
+d_off <- df %>% filter(exit_type %in% c("Violent", "Drug", "Other")) %>%
+  mutate(exit_type = factor(exit_type, levels = c("Violent", "Drug", "Other")))
+
+# --- Release: best, largest, worst
+d_rel <- df %>% filter(exit_sup_reason %in% c(
+    "Discharged - Expiration of Sentence", "Parole Granted",
+    "Released to Special Sentence")) %>%
+  mutate(exit_sup_reason = factor(exit_sup_reason, levels = c(
+    "Discharged - Expiration of Sentence", "Parole Granted",
+    "Released to Special Sentence")))
+
+p1 <- km_panel(d_risk, "risk_ranking", c("Low", "High"),
+               "Risk classification", pal2)
+p2 <- km_panel(d_off, "exit_type", c("Violent", "Drug", "Other"),
+               "Offense type", pal3)
+p3 <- km_panel(df, "sex", c("Female", "Male"), "Sex", pal2)
+p4 <- km_panel(d_rel, "exit_sup_reason",
+               c("Expiration", "Parole granted", "Special sentence"),
+               "Release reason", pal3)
+
+(p1 | p2) / (p3 | p4)
 ```
+*Selected categories shown for legibility; full results in the hazard ratio tables*
 
-## Conclusion
 
-- Summarize your key findings.
+---
 
-- Discuss the implications of your results.
+## Log-Rank Tests
 
-## References
+| Comparison | χ² | df | *p* |
+|------------|---:|---:|----:|
+| Release reason | 1,254.57 | 7 | <0.001 |
+| Offense type | 527.04 | 4 | <0.001 |
+| Risk classification | 367.29 | 3 | <0.001 |
+| Sex | 98.53 | 1 | <0.001 |
+
+
+These are **unadjusted** comparisons — they don't account for relationships among the predictors. That motivates a multivariable model.
+
+. . .
+
+---
+
+## The Cox Proportional Hazards Model {.smaller}
+
+$$
+\lambda(t \mid X) = \lambda_0(t)\exp(\beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p)
+$$
+
+- $\lambda_0(t)$ is the **baseline hazard**, left unspecified — no distributional assumption about survival times
+- $\beta_j$ is a regression coefficient; $X_j$ an explanatory variable
+
+
+$$
+\text{HR}_j = \exp(\beta_j)
+$$
+
+- **HR > 1** → higher hazard of reincarceration
+- **HR < 1** → lower hazard
+- **HR = 1** → no difference
+
+
+
+::: {.callout-important appearance="simple"}
+**The core assumption:** the hazard ratio for a predictor stays constant across the whole follow-up period.
+:::
+
+. . .
+
+---
+
+## Initial Cox Model: Who {.smaller}
+
+31,700 records · 11,699 events · LR χ² = 2,776.51, df = 16, *p* < 0.001 · **concordance = 0.638**
+
+| Predictor | HR | 95% CI |
+|-----------|---:|--------|
+| Age (per year) | 0.986 | 0.984 – 0.987 |
+| Male (vs. female) | 1.289 | 1.216 – 1.367 |
+| Moderate risk (vs. low) | 1.180 | — |
+| High risk (vs. low) | 1.515 | — |
+| Not assessed (vs. low) | 0.867 | 0.774 – 0.972 |
+| Violent offense (vs. drug) | 0.617 | 0.583 – 0.653 |
+
+
+- Each additional year of age → **1.4% lower** hazard
+- High-risk classification → **51.5% higher** hazard than low risk
+- Violent offenses → **38.3% lower** hazard than drug offenses
+. . .
+
+---
+
+## Initial Cox Model: Release Pathway {.smaller}
+
+Reference: discharged at expiration of sentence
+
+| Release reason | HR | 95% CI |
+|----------------|---:|--------|
+| Released to special sentence | 2.83 | 2.57 – 3.12 |
+| Paroled to Iowa detainer | 2.60 | 2.19 – 3.08 |
+| Parole granted | 1.89 | 1.80 – 1.99 |
+| Paroled to out-of-state detainer | 1.02 | *p* = 0.871 |
+| Paroled w/ immediate discharge | 0.72 | 0.62 – 0.83 |
+| U.S. Marshal detainer | 0.15 | — |
+| INS detainer | 0.11 | — |
+
+
+Release pathway produced the **largest** differences in the model — but these are associations, not evidence that release arrangements cause or prevent return.
+
+. . .
+
+---
+
+## The Assumption Fails {.smaller}
+
+Scaled Schoenfeld residual tests on the initial model:
+
+| Term | χ² | *p* |
+|------|---:|----:|
+| **Global** | **437.69** | **<0.001** |
+| Release reason | 370.66 | <0.001 |
+| Risk classification | 31.01 | <0.001 |
+| Offense type | 22.81 | <0.001 |
+| Sex | 7.89 | 0.005 |
+| Age | — | 0.115 |
+
+
+Several predictor effects **vary over follow-up**. A single hazard ratio may not describe them well — exactly what Bellera et al. [-@bellera2010] warn about.
+
+Release reason showed the strongest violation → **stratify on it**.
+
+. . .
+
+---
+
+## Stratified Cox Model {.smaller}
+
+Separate baseline hazard for each release category; shared coefficients for everything else.
+
+::: {.columns}
+::: {.column width="50%"}
+**Estimates barely moved**
+
+| Predictor | Initial | Stratified |
+|-----------|--------:|-----------:|
+| Age | 0.986 | 0.986 |
+| Male | 1.289 | 1.290 |
+| High risk | 1.515 | 1.511 |
+| Violent | 0.617 | 0.617 |
+:::
+
+::: {.column width="50%"}
+**PH test after stratification**
+
+| Term | Before | After |
+|------|-------:|------:|
+| Global | 437.69 | **67.15** |
+| Risk | 31.01 | 8.63 |
+| Offense | 22.81 | **50.49** |
+:::
+:::
+
+
+- Global statistic dropped sharply — stratification helped
+- But it **did not resolve** the violation: global *p* < 0.001
+- Offense type's violation got **worse**
+
+. . .
+
+---
+
+## What This Means {.smaller}
+
+- **Older age and female sex** were associated with lower hazard; **high-risk classification** with higher hazard.
+
+- **Release pathway** showed the largest differences, though federal detainer groups likely reflect unobservable out-of-state returns.
+
+- **The methodological finding is the real result:** statistically significant coefficients do not mean the model is adequate.
+
+- Remaining hazard ratios should be read as **summary estimates across follow-up**, not constant relative hazards at every time point.
+
+- Concordance of **0.638** — modest. Post-release employment, housing, and treatment access are not in these data.
+
+---
+
+## Limitations {.smaller}
+
+- **Individual identifiers are fully redacted**, so we cannot verify whether one person contributes multiple release records — a possible violation of the independence assumption.
+
+- **Follow-up duration could not be verified.** Censoring at 1,095 days is an analytical assumption, not confirmed event-free observation.
+
+- **Recidivism is the agency's definition** — return to prison for any reason, combining new offenses with technical violations.
+
+- **Out-of-jurisdiction returns are invisible**, which almost certainly explains the very low detainer-group hazards.
+
+- Stratification addressed one violating predictor; **others remain**.
+
+---
+
+## Conclusion {.smaller}
+
+- Among 31,700 Iowa release records, **36.9%** ended in reincarceration, with returns peaking **6–7 months** after release.
+
+- Age, sex, risk classification, offense type, and release pathway were all associated with the hazard of return.
+
+- **The proportional hazards assumption was violated**, and stratification only partly addressed it.
+
+- Timing matters: *whether* someone returns and *when* they return are different questions, and only the second can inform when to deploy supervision and reentry resources.
+
+
+
+**Next steps:** predictor-by-time interactions, competing-risk methods for out-of-jurisdiction transfers, and verified individual follow-up durations.
+
+. . .
+
+---
+
+## References {.smaller}
+
+::: {#refs}
+:::
+
+---
+
+## Thank You {.center}
+
+**Questions?**
+
+Full write-up: [Link to report](https://ahunter99.github.io/IDC6940_CoxModel/)
+
+
+
+
+
+
+
+

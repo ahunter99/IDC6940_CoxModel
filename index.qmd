@@ -59,7 +59,7 @@ before the results of a Cox model are interpreted. However, this does
 not always happen in practice. Reviews of pediatric leukemia and total
 joint arthroplasty studies found that the proportional hazards
 assumption was often not reported or was not adequately evaluated
-[@kuitunen2021]; [@kuitunen2023]. Bellera et al. also emphasized that
+[@kuitunen2023]. Bellera et al. also emphasized that
 researchers should investigate whether effects change over time rather
 than automatically assuming that proportional hazards are present
 [@bellera2010].
@@ -109,7 +109,7 @@ applied Cox PH to model economic behavior, using the Efron
 partial-likelihood method and step-wise variable selection to examine
 how long it took rice farmers to pay an agricultural insurance premium.
 They found that education level, off-farm employment, and production
-costs affected how quickly farmers acted.[@soobramoney2023] treated
+costs affected how quickly farmers acted. [@soobramoney2023] treated
 website user drop-off as a survival problem, in which “survival” meant
 viewing at least three pages. Both Cox PH and a survival random forest
 model were used, and browser type, landing page, and search-referral
@@ -332,17 +332,18 @@ individuals who were never formally assessed had a lower rate than the
 low risk group. This might indicate some bias as the reason for the
 missing risk is unknown.
 
-The eight release supervision types in the data also produced different
-outcomes. Individuals discharged at the expiration of their sentence had
-survival probabilities staying above 70% across the full three year
-period. Those paroled with immediate discharge and those released to
-special sentences had survival probabilities falling below 60% within
-the first year. Individuals granted parole, who made up the largest
-group at 20,551, fell in between. These differences suggest that release
-type may be more than a marker of underlying offender characteristics,
-and that supervision conditions themselves could shape reentry outcomes.
+The eight release supervision types (reasons) also produced different outcomes. 
+Individuals paroled to an Iowa detainer had the highest reincarceration 
+rate at 52.2%, although this was a small group (n = 270). Those released 
+to a special sentence followed at 47.9%, and those granted parole, the 
+largest group at 20,551, were reincarcerated at 41.9%. Individuals 
+discharged at the expiration of their sentence were reincarcerated 
+at 26.1%, and their survival probability stayed above 70% across the 
+full three year period. Those paroled with immediate discharge 
+had a lower rate at 18.2%. These differences suggest that release type 
+may be associated with both whether and when reincarceration occurs. 
 
-```{r, warning=FALSE, echo=T, message=FALSE}
+```{r, warning=FALSE, echo=FALSE, message=FALSE}
 # loading packages 
 library(tidyverse)
 library(knitr)
@@ -422,6 +423,14 @@ df |>
   )
 ```
 
+```{r data-reincar rate, echo=FALSE }
+# df %>%
+#   group_by(exit_sup_reason) %>%
+#   summarise(n = n(), events = sum(event), rate_pct = round(100 * mean(event), 1)) %>%
+#   arrange(desc(rate_pct))
+```
+
+
 ```{r - histo plot, echo=FALSE}
 histo_plot <- df %>%
   filter(event == 1L) %>%
@@ -499,7 +508,6 @@ verified, these censoring times reflect an analytical assumption rather
 than confirmed event-free observation.
 
 
-
 ### Modeling and Results
 
 The dataset contained 31,703 release records. Three records with missing
@@ -508,7 +516,7 @@ event was days from release to reincarceration; individuals with no
 return were right-censored at 1,095 days (three years). Six people
 reincarcerated on the day of release had their time set to 0.5 days so
 they remained in the risk set. Age was centered at the sample mean
-(\[mean\] years), so its hazard ratio reflects a one-year difference
+(`r round(mean(df$age, na.rm = TRUE), 1)` years), so its hazard ratio reflects a one-year difference
 from the average. Missing risk classification (n = 1,566) was retained
 as a “Not Assessed” category. Reference levels were female, Low risk,
 Drug offense, and discharge at expiration of sentence.
@@ -709,6 +717,7 @@ Although these findings demonstrate unadjusted differences in survival
 distributions, they do not account for relationships among the predictors. 
 Therefore, a multivariable Cox proportional hazards model was fitted to 
 examine these associations while adjusting for the other explanatory variables.
+
 #### Initial Cox Proportional Hazards Model
 
 ```{r, echo=FALSE}
@@ -860,10 +869,10 @@ pairs.
 
 Age was negatively associated with reincarceration, with each additional year 
 of age corresponding to an approximately 1.4% lower estimated hazard (HR = 0 
-986, 95% CI: 0.984–0.987). Males had a 28.9% as high estimated hazard than 
+986, 95% CI: 0.984–0.987). Males had a 28.9% higher estimated hazard than 
 females (HR = 1.289, 95% CI: 1.216–1.367). Compared with individuals 
 classified as low risk, those classified as moderate and high risk had 
-estimated hazards that were 18.0% and 51.5% as high, respectively.
+estimated hazards that were 18.0% and 51.5% higher, respectively.
 
 Differences were also observed across offense types. Compared with individuals 
 convicted of drug offenses, those with property, public order, and violent 
